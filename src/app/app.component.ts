@@ -362,6 +362,20 @@ export class AppComponent implements OnInit {
     this.selectedTab = tab;
   }
 
+  scrollToBottom(): void {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth'
+    });
+  }
+
+  scrollToTop(): void {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+
   private requestUrl(baseUrl: string): string {
     if (!this.authToken) {
       return baseUrl;

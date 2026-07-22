@@ -42,3 +42,6 @@ testem.log
 Thumbs.db
 # Ignore local environment overrides that contain secrets
 src/environments/firebase.env.ts
+/.firebase
+.firebaserc
+firebase.json

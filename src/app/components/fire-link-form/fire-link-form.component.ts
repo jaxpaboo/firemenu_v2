@@ -25,7 +25,7 @@ import { FireLink } from '../../models/fire-link';
           <div class="preview"><img [src]="model.icon || '/fire.ico'" alt="Fire icon preview" /></div>
 
           <label class="field-label" for="url">Fire Link</label>
-          <textarea id="url" name="url" rows="5" [(ngModel)]="model.url" #urlControl="ngModel" required placeholder="https://..."></textarea>
+          <input id="url" name="url" [(ngModel)]="model.url" #urlControl="ngModel" required placeholder="https://..." />
           <div class="field-message" *ngIf="form.submitted || urlControl.touched"><span *ngIf="urlControl.errors?.['required']" class="error">Fire Link is required.</span></div>
 
           <div class="form-actions">
@@ -44,8 +44,8 @@ import { FireLink } from '../../models/fire-link';
     `.modal-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }`,
     `.field-label { display: block; margin-bottom: 0.5rem; font-weight: 600; }`,
     `input, textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 0.75rem; padding: 0.9rem 1rem; font-size: 0.95rem; color: #111827; background: #ffffff; }`,
-    `.preview { margin: 0.75rem 0 1.25rem; display: flex; justify-content: center; align-items: center; min-height: 120px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.75rem; }`,
-    `.preview img { max-width: 100%; max-height: 150px; border-radius: 0.75rem; object-fit: contain; }`,
+    `.preview { margin: 0.75rem 0 1.25rem; display: flex; justify-content: center; align-items: center; min-height: 50px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.75rem; }`,
+    `.preview img { max-width: 25%; max-height: 50px; border-radius: 0.75rem; object-fit: contain; }`,
     `.field-message { min-height: 1.25rem; font-size: 0.875rem; color: #dc2626; margin-top: 0.25rem; }`,
     `.form-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }`,
     `.btn { border: none; border-radius: 0.75rem; padding: 0.8rem 1.25rem; font-size: 0.95rem; cursor: pointer; transition: transform 0.15s ease, background-color 0.15s ease; }`,

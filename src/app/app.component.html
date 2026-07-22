@@ -38,6 +38,13 @@
           <p class="list-subtitle" *ngIf="isAuthenticated">Open, edit, or delete any item in the list.</p>
         </div>
         <div class="list-actions">
+          <button
+            type="button"
+            class="scroll-down-btn"
+            (click)="scrollToBottom()"
+            aria-label="Scroll to bottom">
+            ↓
+          </button>
           <button class="btn btn-success" type="button" (click)="startNew()" [hidden]="!isAuthenticated">New Fire Link</button>
         </div>
       </div>
@@ -52,6 +59,17 @@
       (toggleFavorite)="toggleFavorite($event)"
       (toggleWatched)="toggleWatched($event)"
     ></app-fire-link-list>
+    <div class="list-header-row">
+      <div class="list-actions">
+        <button
+          class="scroll-top-btn"
+          (click)="scrollToTop()"
+          aria-label="Back to top">
+          ↑
+        </button>
+      </div>
+    </div>
+    
   </section>
 
   <app-fire-link-form
@@ -63,4 +81,5 @@
     (cancel)="cancel()"
     (delete)="deleteItem($event)"
   ></app-fire-link-form>
+
 </main>
