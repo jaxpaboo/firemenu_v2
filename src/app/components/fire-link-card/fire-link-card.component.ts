@@ -50,7 +50,7 @@ import { FireLink } from '../../models/fire-link';
     `.card:hover { transform: translateY(-3px); box-shadow: 0 18px 50px rgb(15 23 42 / 0.08); }`,
     `.card-image-wrapper { position: relative; width: 100%; min-height: 140px; background: #f3f4f6; }`,
     `.card-image { display: block; width: 100%; height: 100%; }`,
-    `.card-image img { width: 100%; height: 180px; object-fit: contain; background: #ffffff; }`,
+    `.card-image img { width: 100%; height: 140px; object-fit: contain; background: #ffffff; }`,
     `.card-overlay-icons { position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 0.25rem; }`,
     `.icon-toggle { border: none; background: rgba(255, 255, 255, 0.9); cursor: pointer; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border-radius: 0.5rem; opacity: 0.7; transition: opacity 0.2s ease, background-color 0.2s ease; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); }`,
     `.icon-toggle:hover { opacity: 1; }`,

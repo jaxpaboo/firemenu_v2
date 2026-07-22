@@ -1,20 +1,26 @@
 <header class="topbar">
-  <div class="brand">Fire Menu</div>
-  <nav class="tabs" aria-label="Primary navigation">
-    <button 
-      *ngFor="let tab of tabs"
-      [class.active]="selectedTab === tab.value"
-      class="tab" 
-      type="button"
-      (click)="selectTab(tab.value)">
-      {{ tab.label }}
-    </button>
-  </nav>
-  <div class="auth-actions">
-    <button class="btn btn-primary" type="button" (click)="isAuthenticated ? logout() : toggleLoginPanel()">
-      {{ isAuthenticated ? 'Logout' : 'Login' }}
-    </button>
+  <div class="header-row">
+    <div class="brand">Fire Menu</div>
+    <nav class="tabs" aria-label="Primary navigation">
+      <button 
+        *ngFor="let tab of tabs"
+        [class.active]="selectedTab === tab.value"
+        class="tab" 
+        type="button"
+        (click)="selectTab(tab.value)">
+        {{ tab.label }}
+      </button>
+    </nav>
+    <div class="auth-actions">
+      <button 
+        class="btn btn-primary" 
+        type="button" 
+        (click)="isAuthenticated ? logout() : toggleLoginPanel()">
+        {{ isAuthenticated ? 'Logout' : 'Login' }}
+      </button>
+    </div>
   </div>
+  
 </header>
 
 <app-login-modal
@@ -33,9 +39,7 @@
     <div class="list-header">
       <div class="list-header-row">
         <div>
-          <p class="section-label">Fire Links</p>
-          <h2>Main Gallery</h2>
-          <p class="list-subtitle" *ngIf="isAuthenticated">Open, edit, or delete any item in the list.</p>
+          <p class="section-label">Fire Links -- <b>{{selectedTab.toUpperCase()}}</b></p>
         </div>
         <div class="list-actions">
           <button

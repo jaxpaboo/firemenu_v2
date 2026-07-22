@@ -21,7 +21,7 @@ import { FireLinkCardComponent } from '../fire-link-card/fire-link-card.componen
       />
     </div>
   `,
-  styles: [`.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }`],
+  styles: [`.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }`],
 })
 export class FireLinkListComponent {
   @Input() items: FireLink[] = [];
