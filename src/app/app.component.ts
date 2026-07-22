@@ -5,18 +5,15 @@ declare const require: any;
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-
-interface FireLink {
-  id: number;
-  name: string;
-  icon: string;
-  url: string;
-}
+import { FireLink } from './models/fire-link';
+import { LoginModalComponent } from './components/login-modal/login-modal.component';
+import { FireLinkFormComponent } from './components/fire-link-form/fire-link-form.component';
+import { FireLinkListComponent } from './components/fire-link-list/fire-link-list.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, LoginModalComponent, FireLinkFormComponent, FireLinkListComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
@@ -66,6 +63,14 @@ export class AppComponent implements OnInit {
   formModel: FireLink = this.emptyLink();
   editingId = 0;
   showModal = false;
+  
+  selectedTab: 'main' | 'watched' | 'favorites' | 'all' = 'main';
+  tabs: Array<{ label: string; value: 'main' | 'watched' | 'favorites' | 'all' }> = [
+    { label: 'Main', value: 'main' },
+    { label: 'Watched', value: 'watched' },
+    { label: 'Favorites', value: 'favorites' },
+    { label: 'All', value: 'all' },
+  ];
 
   constructor(private http: HttpClient) {}
 
@@ -235,24 +240,24 @@ export class AppComponent implements OnInit {
       : Object.entries(response as Record<string, unknown>);
 
     return rawEntries
-      .map(([key, item]) => {
+      .map(([key, item], index) => {
         const data = item as Record<string, unknown>;
         const name = String(data?.['name'] ?? '');
         const icon = String(data?.['imagePath'] ?? data?.['icon'] ?? '');
         const url = String(data?.['url'] ?? data?.['link'] ?? '');
+        const isFavorite = Boolean(data?.['isFavorite'] ?? false);
+        const isWatched = Boolean(data?.['isWatched'] ?? false);
 
         return {
-          id: Number.isFinite(Number(key)) && Number(key) > 0 ? Number(key) : 0,
+          id: index + 1,
           name,
           icon: icon || 'https://via.placeholder.com/320x140?text=No+icon',
           url,
+          isFavorite,
+          isWatched,
         };
       })
-      .filter((item) => item.name || item.url)
-      .map((item, index) => ({
-        ...item,
-        id: item.id || index + 1,
-      }));
+      .filter((item) => item.name || item.url);
   }
 
   editItem(item: FireLink) {
@@ -308,6 +313,8 @@ export class AppComponent implements OnInit {
       name: item.name,
       imagePath: item.icon,
       url: item.url,
+      isFavorite: item.isFavorite ?? false,
+      isWatched: item.isWatched ?? false,
     }));
 
     const url = this.requestUrl(this.dataUrl);
@@ -319,6 +326,40 @@ export class AppComponent implements OnInit {
         console.error('Error updating Firebase list:', error);
       },
     });
+  }
+
+  toggleFavorite(item: FireLink): void {
+    const index = this.items.findIndex((i) => i.id === item.id);
+    if (index !== -1) {
+      this.items[index].isFavorite = !this.items[index].isFavorite;
+      this.persistItems();
+    }
+  }
+
+  toggleWatched(item: FireLink): void {
+    const index = this.items.findIndex((i) => i.id === item.id);
+    if (index !== -1) {
+      this.items[index].isWatched = !this.items[index].isWatched;
+      this.persistItems();
+    }
+  }
+
+  getDisplayedItems(): FireLink[] {
+    switch (this.selectedTab) {
+      case 'watched':
+        return this.items.filter((item) => item.isWatched);
+      case 'favorites':
+        return this.items.filter((item) => item.isFavorite);
+      case 'all':
+        return this.items;
+      case 'main':
+      default:
+        return this.items.filter((item) => !item.isWatched && !item.isFavorite);
+    }
+  }
+
+  selectTab(tab: 'main' | 'watched' | 'favorites' | 'all'): void {
+    this.selectedTab = tab;
   }
 
   private requestUrl(baseUrl: string): string {

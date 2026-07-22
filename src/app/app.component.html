@@ -1,7 +1,14 @@
 <header class="topbar">
   <div class="brand">Fire Menu</div>
   <nav class="tabs" aria-label="Primary navigation">
-    <button class="tab active" type="button">Main</button>
+    <button 
+      *ngFor="let tab of tabs"
+      [class.active]="selectedTab === tab.value"
+      class="tab" 
+      type="button"
+      (click)="selectTab(tab.value)">
+      {{ tab.label }}
+    </button>
   </nav>
   <div class="auth-actions">
     <button class="btn btn-primary" type="button" (click)="isAuthenticated ? logout() : toggleLoginPanel()">
@@ -10,30 +17,16 @@
   </div>
 </header>
 
-<!-- Login modal -->
-<div class="modal-backdrop" *ngIf="showLoginPanel">
-  <div class="modal login-modal">
-    <div class="modal-header">
-      <h3>Sign in</h3>
-      <button class="btn btn-secondary" type="button" (click)="toggleLoginPanel()">Close</button>
-    </div>
-    <form #authForm="ngForm" (ngSubmit)="isAuthenticated ? logout() : login(authForm)" class="modal-body login-form">
-      <div class="login-row">
-        <label for="authEmail">Email</label>
-        <input id="authEmail" name="authEmail" type="email" [(ngModel)]="authEmail" required placeholder="you@example.com" />
-      </div>
-      <div class="login-row">
-        <label for="authPassword">Password</label>
-        <input id="authPassword" name="authPassword" type="password" [(ngModel)]="authPassword" required placeholder="Password" />
-      </div>
-      <div class="login-row login-controls">
-        <button class="btn btn-primary" type="submit">Sign in</button>
-        <button class="btn btn-secondary" type="button" (click)="toggleLoginPanel()">Cancel</button>
-      </div>
-      <div class="auth-error" *ngIf="authError">{{ authError }}</div>
-    </form>
-  </div>
-</div>
+<app-login-modal
+  [visible]="showLoginPanel"
+  [email]="authEmail"
+  [password]="authPassword"
+  [error]="authError"
+  (emailChange)="authEmail = $event"
+  (passwordChange)="authPassword = $event"
+  (submit)="isAuthenticated ? logout() : login($event)"
+  (close)="toggleLoginPanel()"
+></app-login-modal>
 
 <main class="page">
   <section class="list-panel">
@@ -50,49 +43,24 @@
       </div>
     </div>
 
-    <div class="grid">
-      <article *ngFor="let item of items" class="card">
-        <a class="card-image" [href]="item.url" target="_blank" rel="noopener noreferrer">
-          <img [src]="item.icon" [alt]="item.name" />
-        </a>
-        <div class="card-body">
-          <h3>{{ item.name }}</h3>
-          <div class="card-actions">
-            <button *ngIf="isAuthenticated" class="icon-button primary" type="button" (click)="editItem(item)">Edit</button>
-            <button *ngIf="isAuthenticated" class="icon-button danger" type="button" (click)="deleteItem(item)">Delete</button>
-          </div>
-        </div>
-      </article>
-    </div>
+    <app-fire-link-list
+      [items]="getDisplayedItems()"
+      [isAuthenticated]="isAuthenticated"
+      [currentTab]="selectedTab"
+      (editItem)="editItem($event)"
+      (deleteItem)="deleteItem($event)"
+      (toggleFavorite)="toggleFavorite($event)"
+      (toggleWatched)="toggleWatched($event)"
+    ></app-fire-link-list>
   </section>
 
-  <!-- Modal editor -->
-  <div class="modal-backdrop" *ngIf="showModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>{{ isEditing ? 'Edit Fire Link' : 'Create Fire Link' }}</h3>
-        <button class="btn btn-secondary" type="button" (click)="cancel(form)">Close</button>
-      </div>
-
-      <form #form="ngForm" (ngSubmit)="save(form)" class="modal-body" novalidate>
-        <label class="field-label" for="name">Fire Name</label>
-        <input id="name" name="name" type="text" [(ngModel)]="formModel.name" #nameControl="ngModel" required placeholder="LUMovies" />
-        <div class="field-message" *ngIf="form.submitted || nameControl.touched"><span *ngIf="nameControl.errors?.['required']" class="error">Fire Name is required.</span></div>
-
-        <label class="field-label" for="icon">Fire Icon</label>
-        <input id="icon" name="icon" type="url" [(ngModel)]="formModel.icon" required placeholder="https://example.com/icon.png" />
-        <div class="preview"><img [src]="formModel.icon || 'https://via.placeholder.com/320x140?text=Icon+Preview'" alt="Fire icon preview" /></div>
-
-        <label class="field-label" for="url">Fire Link</label>
-        <textarea id="url" name="url" rows="5" [(ngModel)]="formModel.url" #urlControl="ngModel" required placeholder="https://..."></textarea>
-        <div class="field-message" *ngIf="form.submitted || urlControl.touched"><span *ngIf="urlControl.errors?.['required']" class="error">Fire Link is required.</span></div>
-
-        <div class="form-actions">
-          <button class="btn btn-outline btn-outline-primary" type="submit" [disabled]="form.invalid || !isAuthenticated">{{ isEditing ? 'Save changes' : 'Save' }}</button>
-          <button class="btn btn-outline btn-outline-secondary" type="button" (click)="cancel(form)">Cancel</button>
-          <button *ngIf="isEditing && isAuthenticated" class="btn btn-outline btn-outline-danger" type="button" (click)="deleteItem(formModel)">Delete</button>
-        </div>
-      </form>
-    </div>
-  </div>
+  <app-fire-link-form
+    [visible]="showModal"
+    [model]="formModel"
+    [isEditing]="isEditing"
+    [isAuthenticated]="isAuthenticated"
+    (save)="save($event)"
+    (cancel)="cancel()"
+    (delete)="deleteItem($event)"
+  ></app-fire-link-form>
 </main>
