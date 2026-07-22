@@ -44,10 +44,10 @@
         <div class="list-actions">
           <button
             type="button"
-            class="scroll-down-btn"
-            (click)="scrollToBottom()"
-            aria-label="Scroll to bottom">
-            ↓
+            class="scroll-top-btn"
+            (click)="scrollToTop()"
+            aria-label="Scroll to top">
+            ↑
           </button>
           <button class="btn btn-success" type="button" (click)="startNew()" [hidden]="!isAuthenticated">New Fire Link</button>
         </div>
@@ -66,10 +66,10 @@
     <div class="list-header-row">
       <div class="list-actions">
         <button
-          class="scroll-top-btn"
-          (click)="scrollToTop()"
-          aria-label="Back to top">
-          ↑
+          class="scroll-down-btn"
+          (click)="scrollToBottom()"
+          aria-label="Scroll to bottom">
+          ↓
         </button>
       </div>
     </div>
