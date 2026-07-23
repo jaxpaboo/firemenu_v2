@@ -1,4 +1,4 @@
-<header class="topbar" (dblclick)="onHeaderDoubleClick($event)">
+<header class="topbar" (dblclick)="onHeaderDoubleClick($event)" [ngStyle]="{ 'z-index': isModalActive() ? 10 : 100 }">
   <div class="brand-section">
     <div class="brand">Fire Menu</div>
     <div class="tabs-dropdown" aria-label="Primary navigation">
@@ -38,7 +38,7 @@
 
 <main class="page">
   <section class="list-panel">
-    <div class="list-header" (dblclick)="onHeaderDoubleClick($event)">
+    <div class="list-header" (dblclick)="onHeaderDoubleClick($event)" [ngStyle]="{ 'z-index': isModalActive() ? 10 : 50 }">
       <div class="list-header-row">
         <div>
           <p class="section-label">Fire Links -- <b>{{selectedTab.toUpperCase()}}</b></p>

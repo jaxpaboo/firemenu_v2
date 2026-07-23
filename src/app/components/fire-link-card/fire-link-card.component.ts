@@ -22,11 +22,7 @@ export class FireLinkCardComponent {
   hoveredButton: string | null = null;
 
   onEditClick(): void {
-    this.confirmationNeeded.emit({
-      action: 'Are you sure you want to <strong>edit</strong> this item?',
-      item: this.item,
-      callback: () => this.edit.emit(this.item)
-    });
+    this.edit.emit(this.item);
   }
 
   onDeleteClick(): void {
@@ -38,19 +34,11 @@ export class FireLinkCardComponent {
   }
 
   onFavoriteClick(): void {
-    this.confirmationNeeded.emit({
-      action: `Are you sure you want to ${this.item.isFavorite ? 'remove from' : 'add to'} <strong>favorites</strong>?`,
-      item: this.item,
-      callback: () => this.toggleFavorite.emit(this.item)
-    });
+    this.toggleFavorite.emit(this.item);
   }
 
   onWatchedClick(): void {
-    this.confirmationNeeded.emit({
-      action: `Are you sure you want to ${this.item.isWatched ? 'remove from' : 'add to'} <strong>watched</strong>?`,
-      item: this.item,
-      callback: () => this.toggleWatched.emit(this.item)
-    });
+    this.toggleWatched.emit(this.item);
   }
 
   setHoveredButton(button: string | null): void {
