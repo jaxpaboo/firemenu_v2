@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2 } from '@angular/core';
+import { Component, HostListener, OnInit, Renderer2 } from '@angular/core';
 
 // Allow optional runtime `require` for an ignored local env file
 declare const require: any;
@@ -19,6 +19,8 @@ import { ConfirmationToastComponent } from './components/confirmation-toast/conf
 })
 export class AppComponent implements OnInit {
   title = 'Fire Menu';
+  readonly appVersion = '2.0.1';
+  showSettingsMenu = false;
 
   menuTabs = [
     { label: 'Fire Menu', active: true },
@@ -94,6 +96,29 @@ export class AppComponent implements OnInit {
 
   isModalActive(): boolean {
     return this.showLoginPanel || this.showModal;
+  }
+
+  toggleSettingsMenu(): void {
+    this.showSettingsMenu = !this.showSettingsMenu;
+  }
+
+  onLogoutClick(): void {
+    this.showSettingsMenu = false;
+    if (this.isAuthenticated) {
+      this.logout();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.showSettingsMenu) {
+      return;
+    }
+
+    const target = event.target as HTMLElement;
+    if (!target.closest('.settings-menu')) {
+      this.showSettingsMenu = false;
+    }
   }
 
   toggleLoginPanel(): void {

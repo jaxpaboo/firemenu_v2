@@ -16,12 +16,34 @@
         </button>
       </div>
     </div>
-    <button 
-      class="btn btn-outline btn-outline-primary" 
-      type="button" 
-      (click)="isAuthenticated ? logout() : toggleLoginPanel()">
-      {{ isAuthenticated ? 'Logout' : 'Login' }}
+    <button
+      *ngIf="!isAuthenticated"
+      class="btn btn-outline btn-outline-primary"
+      type="button"
+      (click)="toggleLoginPanel()">
+      Login
     </button>
+  </div>
+
+  <div class="header-controls">
+    <div class="settings-menu">
+      <button
+        class="gear-btn"
+        type="button"
+        aria-label="Open settings menu"
+        aria-haspopup="true"
+        [attr.aria-expanded]="showSettingsMenu"
+        (click)="toggleSettingsMenu()">
+        &#9881;
+      </button>
+
+      <div class="settings-dropdown" *ngIf="showSettingsMenu">
+        <button *ngIf="isAuthenticated" class="settings-item" type="button" (click)="onLogoutClick()">
+          Logout
+        </button>
+        <div class="settings-version">v{{ appVersion }}</div>
+      </div>
+    </div>
   </div>
 </header>
 
