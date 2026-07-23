@@ -3,11 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 
 @Component({
-  selector: 'app-login-modal',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './login-modal.component.html',
-  styleUrl: './login-modal.component.scss',
+    selector: 'app-login-modal',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './login-modal.component.html',
+    styleUrl: './login-modal.component.scss'
 })
 export class LoginModalComponent {
   @Input() visible = false;

@@ -3,11 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FireLink } from '../../models/fire-link';
 
 @Component({
-  selector: 'app-fire-link-card',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './fire-link-card.component.html',
-  styleUrl: './fire-link-card.component.scss',
+    selector: 'app-fire-link-card',
+    imports: [CommonModule],
+    templateUrl: './fire-link-card.component.html',
+    styleUrl: './fire-link-card.component.scss'
 })
 export class FireLinkCardComponent {
   @Input() item!: FireLink;

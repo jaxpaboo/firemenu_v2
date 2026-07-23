@@ -12,11 +12,10 @@ import { FireLinkListComponent } from './components/fire-link-list/fire-link-lis
 import { ConfirmationToastComponent } from './components/confirmation-toast/confirmation-toast.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, LoginModalComponent, FireLinkFormComponent, FireLinkListComponent, ConfirmationToastComponent],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+    selector: 'app-root',
+    imports: [CommonModule, FormsModule, HttpClientModule, LoginModalComponent, FireLinkFormComponent, FireLinkListComponent, ConfirmationToastComponent],
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
   title = 'Fire Menu';

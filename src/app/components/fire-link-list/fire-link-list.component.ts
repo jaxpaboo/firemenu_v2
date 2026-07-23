@@ -4,11 +4,10 @@ import { FireLink } from '../../models/fire-link';
 import { FireLinkCardComponent } from '../fire-link-card/fire-link-card.component';
 
 @Component({
-  selector: 'app-fire-link-list',
-  standalone: true,
-  imports: [CommonModule, FireLinkCardComponent],
-  templateUrl: './fire-link-list.component.html',
-  styleUrl: './fire-link-list.component.scss',
+    selector: 'app-fire-link-list',
+    imports: [CommonModule, FireLinkCardComponent],
+    templateUrl: './fire-link-list.component.html',
+    styleUrl: './fire-link-list.component.scss'
 })
 export class FireLinkListComponent {
   @Input() items: FireLink[] = [];

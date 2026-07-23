@@ -2,11 +2,10 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-confirmation-toast',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './confirmation-toast.component.html',
-  styleUrl: './confirmation-toast.component.scss',
+    selector: 'app-confirmation-toast',
+    imports: [CommonModule],
+    templateUrl: './confirmation-toast.component.html',
+    styleUrl: './confirmation-toast.component.scss'
 })
 export class ConfirmationToastComponent {
   @Input() visible = false;
