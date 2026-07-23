@@ -7,21 +7,8 @@ import { FireLinkCardComponent } from '../fire-link-card/fire-link-card.componen
   selector: 'app-fire-link-list',
   standalone: true,
   imports: [CommonModule, FireLinkCardComponent],
-  template: `
-    <div class="grid">
-      <app-fire-link-card
-        *ngFor="let item of items"
-        [item]="item"
-        [isAuthenticated]="isAuthenticated"
-        [currentTab]="currentTab"
-        (edit)="editItem.emit($event)"
-        (delete)="deleteItem.emit($event)"
-        (toggleFavorite)="toggleFavorite.emit($event)"
-        (toggleWatched)="toggleWatched.emit($event)"
-      />
-    </div>
-  `,
-  styles: [`.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }`],
+  templateUrl: './fire-link-list.component.html',
+  styleUrl: './fire-link-list.component.scss',
 })
 export class FireLinkListComponent {
   @Input() items: FireLink[] = [];
@@ -31,4 +18,5 @@ export class FireLinkListComponent {
   @Output() deleteItem = new EventEmitter<FireLink>();
   @Output() toggleFavorite = new EventEmitter<FireLink>();
   @Output() toggleWatched = new EventEmitter<FireLink>();
+  @Output() confirmationNeeded = new EventEmitter<{action: string, item: FireLink, callback: () => void}>();
 }

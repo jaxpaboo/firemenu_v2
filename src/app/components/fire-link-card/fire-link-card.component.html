@@ -1,0 +1,51 @@
+<article class="card">
+  <a class="card-link" [href]="item.url" target="_blank" rel="noopener noreferrer">
+    <img class="card-background" [src]="item.icon || '/fire.ico'" [alt]="item.name" />
+  </a>
+
+  <div class="card-top-left-buttons" *ngIf="isAuthenticated">
+    <button 
+      class="icon-toggle edit-icon" 
+      type="button" 
+      (click)="onEditClick()"
+      title="Edit"
+      aria-label="Edit">
+      ✎
+    </button>
+    <button 
+      class="icon-toggle delete-icon" 
+      type="button" 
+      (click)="onDeleteClick()"
+      title="Delete"
+      aria-label="Delete">
+      🗑
+    </button>
+  </div>
+
+  <div class="card-top-right-buttons" *ngIf="isAuthenticated">
+    <button 
+      class="icon-toggle favorite-icon" 
+      [class.active]="item.isFavorite"
+      type="button" 
+      (click)="onFavoriteClick()"
+      title="Toggle Favorite"
+      aria-label="Toggle Favorite">
+      ★
+    </button>
+    <button 
+      class="icon-toggle watched-icon" 
+      [class.active]="item.isWatched"
+      type="button" 
+      (click)="onWatchedClick()"
+      title="Toggle Watched"
+      aria-label="Toggle Watched">
+      📺
+    </button>
+  </div>
+
+  <div class="card-title-overlay">
+    <h3>{{ item.name }}</h3>
+  </div>
+</article>
+
+

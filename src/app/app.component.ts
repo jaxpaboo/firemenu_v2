@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer2 } from '@angular/core';
 
 // Allow optional runtime `require` for an ignored local env file
 declare const require: any;
@@ -9,11 +9,12 @@ import { FireLink } from './models/fire-link';
 import { LoginModalComponent } from './components/login-modal/login-modal.component';
 import { FireLinkFormComponent } from './components/fire-link-form/fire-link-form.component';
 import { FireLinkListComponent } from './components/fire-link-list/fire-link-list.component';
+import { ConfirmationToastComponent } from './components/confirmation-toast/confirmation-toast.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, LoginModalComponent, FireLinkFormComponent, FireLinkListComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, LoginModalComponent, FireLinkFormComponent, FireLinkListComponent, ConfirmationToastComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
@@ -64,6 +65,11 @@ export class AppComponent implements OnInit {
   editingId = 0;
   showModal = false;
   
+  // Confirmation dialog state
+  showConfirmation = false;
+  confirmationMessage = '';
+  pendingCallback: (() => void) | null = null;
+  
   selectedTab: 'main' | 'watched' | 'favorites' | 'all' = 'main';
   tabs: Array<{ label: string; value: 'main' | 'watched' | 'favorites' | 'all' }> = [
     { label: 'Main', value: 'main' },
@@ -72,15 +78,34 @@ export class AppComponent implements OnInit {
     { label: 'All', value: 'all' },
   ];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private renderer: Renderer2) {}
 
   ngOnInit(): void {
     this.tryRestoreSession().then(() => this.loadItems());
   }
 
+  private updateScrollLock(): void {
+    const isAnyModalOpen = this.showLoginPanel || this.showModal;
+    if (isAnyModalOpen) {
+      this.renderer.setStyle(document.body, 'overflow', 'hidden');
+    } else {
+      this.renderer.removeStyle(document.body, 'overflow');
+    }
+  }
+
+  isModalActive(): boolean {
+    return this.showLoginPanel || this.showModal;
+  }
+
   toggleLoginPanel(): void {
     this.showLoginPanel = !this.showLoginPanel;
     this.authError = '';
+    this.updateScrollLock();
+  }
+
+  getCurrentTabLabel(): string {
+    const currentTab = this.tabs.find(t => t.value === this.selectedTab);
+    return currentTab?.label || 'Select Tab';
   }
 
   login(form: NgForm): void {
@@ -109,6 +134,7 @@ export class AppComponent implements OnInit {
           this.setSession(result.idToken, result.refreshToken, Number(result.expiresIn));
           this.authError = '';
           this.showLoginPanel = false;
+          this.updateScrollLock();
           this.loadItems();
         },
         error: (error) => {
@@ -125,6 +151,7 @@ export class AppComponent implements OnInit {
     this.authEmail = '';
     this.authPassword = '';
     this.showLoginPanel = false;
+    this.updateScrollLock();
     try {
       localStorage.removeItem(this.storageKey);
     } catch {}
@@ -206,12 +233,14 @@ export class AppComponent implements OnInit {
   startNew() {
     if (!this.isAuthenticated) {
       this.showLoginPanel = true;
+      this.updateScrollLock();
       return;
     }
 
     this.editingId = 0;
     this.formModel = this.emptyLink();
     this.showModal = true;
+    this.updateScrollLock();
   }
 
   private loadItems(): void {
@@ -298,6 +327,7 @@ export class AppComponent implements OnInit {
     this.startNew();
     form.resetForm(this.formModel);
     this.showModal = false;
+    this.updateScrollLock();
   }
 
   cancel(form?: NgForm) {
@@ -306,6 +336,7 @@ export class AppComponent implements OnInit {
       form.resetForm(this.formModel);
     }
     this.showModal = false;
+    this.updateScrollLock();
   }
 
   private persistItems(): void {
@@ -381,5 +412,26 @@ export class AppComponent implements OnInit {
       return baseUrl;
     }
     return `${baseUrl}?auth=${encodeURIComponent(this.authToken)}`;
+  }
+
+  onConfirmationNeeded(data: {action: string, item: FireLink, callback: () => void}): void {
+    this.confirmationMessage = data.action;
+    this.pendingCallback = data.callback;
+    this.showConfirmation = true;
+  }
+
+  onConfirmationConfirm(): void {
+    if (this.pendingCallback) {
+      this.pendingCallback();
+    }
+    this.showConfirmation = false;
+    this.pendingCallback = null;
+    this.confirmationMessage = '';
+  }
+
+  onConfirmationCancel(): void {
+    this.showConfirmation = false;
+    this.pendingCallback = null;
+    this.confirmationMessage = '';
   }
 }

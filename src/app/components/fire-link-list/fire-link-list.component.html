@@ -1,0 +1,13 @@
+<div class="grid">
+  <app-fire-link-card
+    *ngFor="let item of items"
+    [item]="item"
+    [isAuthenticated]="isAuthenticated"
+    [currentTab]="currentTab"
+    (edit)="editItem.emit($event)"
+    (delete)="deleteItem.emit($event)"
+    (toggleFavorite)="toggleFavorite.emit($event)"
+    (toggleWatched)="toggleWatched.emit($event)"
+    (confirmationNeeded)="confirmationNeeded.emit($event)"
+  />
+</div>

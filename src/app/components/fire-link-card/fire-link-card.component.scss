@@ -1,0 +1,109 @@
+.card {
+  max-width: 175px;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 50px rgb(15 23 42 / 0.08);
+  }
+}
+
+.card-link {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.card-background {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #f3f4f6;
+}
+
+.card-top-left-buttons {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  z-index: 10;
+}
+
+.card-top-right-buttons {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  z-index: 10;
+}
+
+.card-title-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  z-index: 10;
+
+  h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #1e40af;
+    background: rgba(229, 231, 235, 0.75);
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 1.2;
+  }
+}
+
+.icon-toggle {
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  width: 1rem;
+  height: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+  border-radius: 0.3rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.favorite-icon.active,
+.watched-icon.active,
+.edit-icon.active,
+.delete-icon.active {
+  background: #fbbf24;
+  opacity: 1;
+  color: #92400e;
+}
+
+.favorite-icon:not(.active),
+.watched-icon:not(.active),
+.edit-icon:not(.active),
+.delete-icon:not(.active) {
+  opacity: 0.7;
+}
+
+
+

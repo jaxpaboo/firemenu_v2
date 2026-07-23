@@ -1,26 +1,28 @@
 <header class="topbar">
-  <div class="header-row">
+  <div class="brand-section">
     <div class="brand">Fire Menu</div>
-    <nav class="tabs" aria-label="Primary navigation">
-      <button 
-        *ngFor="let tab of tabs"
-        [class.active]="selectedTab === tab.value"
-        class="tab" 
-        type="button"
-        (click)="selectTab(tab.value)">
-        {{ tab.label }}
+    <div class="tabs-dropdown" aria-label="Primary navigation">
+      <button class="tab-toggle" type="button">
+        {{ getCurrentTabLabel() }}
       </button>
-    </nav>
-    <div class="auth-actions">
-      <button 
-        class="btn btn-primary" 
-        type="button" 
-        (click)="isAuthenticated ? logout() : toggleLoginPanel()">
-        {{ isAuthenticated ? 'Logout' : 'Login' }}
-      </button>
+      <div class="dropdown-menu">
+        <button
+          *ngFor="let tab of tabs"
+          [class.active]="selectedTab === tab.value"
+          class="dropdown-item"
+          type="button"
+          (click)="selectTab(tab.value)">
+          {{ tab.label }}
+        </button>
+      </div>
     </div>
+    <button 
+      class="btn btn-outline btn-outline-primary" 
+      type="button" 
+      (click)="isAuthenticated ? logout() : toggleLoginPanel()">
+      {{ isAuthenticated ? 'Logout' : 'Login' }}
+    </button>
   </div>
-  
 </header>
 
 <app-login-modal
@@ -45,6 +47,7 @@
           <button
             type="button"
             class="scroll-top-btn"
+            [hidden]="isModalActive()"
             (click)="scrollToTop()"
             aria-label="Scroll to top">
             ↑
@@ -62,11 +65,13 @@
       (deleteItem)="deleteItem($event)"
       (toggleFavorite)="toggleFavorite($event)"
       (toggleWatched)="toggleWatched($event)"
+      (confirmationNeeded)="onConfirmationNeeded($event)"
     ></app-fire-link-list>
     <div class="list-header-row">
       <div class="list-actions">
         <button
           class="scroll-down-btn"
+          [hidden]="isModalActive()"
           (click)="scrollToBottom()"
           aria-label="Scroll to bottom">
           ↓
@@ -87,3 +92,11 @@
   ></app-fire-link-form>
 
 </main>
+
+<app-confirmation-toast
+  [visible]="showConfirmation"
+  [message]="confirmationMessage"
+  (confirm)="onConfirmationConfirm()"
+  (cancel)="onConfirmationCancel()"
+></app-confirmation-toast>
+

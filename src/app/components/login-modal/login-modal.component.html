@@ -1,0 +1,23 @@
+<div class="modal-backdrop" *ngIf="visible">
+  <div class="modal login-modal">
+    <div class="modal-header">
+      <h3>Sign in</h3>
+      <button class="btn btn-secondary" type="button" (click)="close.emit()">Close</button>
+    </div>
+    <form #authForm="ngForm" (ngSubmit)="submit.emit(authForm)" class="modal-body login-form">
+      <div class="login-row">
+        <label for="authEmail">Email</label>
+        <input id="authEmail" name="authEmail" type="email" [ngModel]="email" (ngModelChange)="emailChange.emit($event)" required placeholder="you@example.com" />
+      </div>
+      <div class="login-row">
+        <label for="authPassword">Password</label>
+        <input id="authPassword" name="authPassword" type="password" [ngModel]="password" (ngModelChange)="passwordChange.emit($event)" required placeholder="Password" />
+      </div>
+      <div class="login-row login-controls">
+        <button class="btn btn-primary" type="submit">Sign in</button>
+        <button class="btn btn-secondary" type="button" (click)="close.emit()">Cancel</button>
+      </div>
+      <div class="auth-error" *ngIf="error">{{ error }}</div>
+    </form>
+  </div>
+</div>

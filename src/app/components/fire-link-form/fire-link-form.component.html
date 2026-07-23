@@ -1,0 +1,28 @@
+<div class="modal-backdrop" *ngIf="visible">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>{{ isEditing ? 'Edit Fire Link' : 'Create Fire Link' }}</h3>
+      <button class="btn btn-secondary" type="button" (click)="cancel.emit()">Close</button>
+    </div>
+
+    <form #form="ngForm" (ngSubmit)="save.emit(form)" class="modal-body" novalidate>
+      <label class="field-label" for="name">Fire Name</label>
+      <input id="name" name="name" type="text" [(ngModel)]="model.name" #nameControl="ngModel" required placeholder="Title here..." />
+      <div class="field-message" *ngIf="form.submitted || nameControl.touched"><span *ngIf="nameControl.errors?.['required']" class="error">Fire Name is required.</span></div>
+
+      <label class="field-label" for="icon">Fire Icon</label>
+      <input id="icon" name="icon" type="url" [(ngModel)]="model.icon" required placeholder="/fire.ico" />
+      <div class="preview"><img [src]="model.icon || '/fire.ico'" alt="Fire icon preview" /></div>
+
+      <label class="field-label" for="url">Fire Link</label>
+      <input id="url" name="url" [(ngModel)]="model.url" #urlControl="ngModel" required placeholder="https://..." />
+      <div class="field-message" *ngIf="form.submitted || urlControl.touched"><span *ngIf="urlControl.errors?.['required']" class="error">Fire Link is required.</span></div>
+
+      <div class="form-actions">
+        <button class="btn btn-outline btn-outline-primary" type="submit" [disabled]="form.invalid || !isAuthenticated">{{ isEditing ? 'Save changes' : 'Save' }}</button>
+        <button class="btn btn-outline btn-outline-secondary" type="button" (click)="cancel.emit()">Cancel</button>
+        <button *ngIf="isEditing && isAuthenticated" class="btn btn-outline btn-outline-danger" type="button" (click)="delete.emit(model)">Delete</button>
+      </div>
+    </form>
+  </div>
+</div>

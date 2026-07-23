@@ -1,0 +1,10 @@
+<div class="confirmation-overlay" *ngIf="visible" (click)="onCancel()">
+  <div class="confirmation-toast" (click)="$event.stopPropagation()">
+    <div class="confirmation-message" [innerHTML]="message">
+    </div>
+    <div class="confirmation-buttons">
+      <button class="btn btn-primary" (click)="onConfirm()">Yes</button>
+      <button class="btn btn-secondary" (click)="onCancel()">No</button>
+    </div>
+  </div>
+</div>
