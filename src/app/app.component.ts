@@ -434,4 +434,29 @@ export class AppComponent implements OnInit {
     this.pendingCallback = null;
     this.confirmationMessage = '';
   }
+
+  onHeaderDoubleClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    // Only trigger if double-clicking on header or empty space, not on buttons
+    if (target.tagName !== 'BUTTON' && 
+        !target.closest('button') && 
+        !target.closest('.dropdown-menu')) {
+      this.toggleScroll();
+    }
+  }
+
+  private toggleScroll(): void {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    
+    // Check if bottom is visible (within 50px tolerance for scroll tolerance)
+    const isBottomVisible = (scrollTop + windowHeight) >= (documentHeight - 50);
+    
+    if (isBottomVisible) {
+      this.scrollToTop();
+    } else {
+      this.scrollToBottom();
+    }
+  }
 }

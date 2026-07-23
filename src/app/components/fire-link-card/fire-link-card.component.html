@@ -1,13 +1,18 @@
 <article class="card">
   <a class="card-link" [href]="item.url" target="_blank" rel="noopener noreferrer">
     <img class="card-background" [src]="item.icon || '/fire.ico'" [alt]="item.name" />
+    <div class="card-title-overlay">
+      <h3>{{ item.name }}</h3>
+    </div>
   </a>
 
   <div class="card-top-left-buttons" *ngIf="isAuthenticated">
     <button 
       class="icon-toggle edit-icon" 
       type="button" 
-      (click)="onEditClick()"
+      (click)="$event.stopPropagation(); onEditClick()"
+      (mouseenter)="setHoveredButton('edit')"
+      (mouseleave)="setHoveredButton(null)"
       title="Edit"
       aria-label="Edit">
       ✎
@@ -15,7 +20,9 @@
     <button 
       class="icon-toggle delete-icon" 
       type="button" 
-      (click)="onDeleteClick()"
+      (click)="$event.stopPropagation(); onDeleteClick()"
+      (mouseenter)="setHoveredButton('delete')"
+      (mouseleave)="setHoveredButton(null)"
       title="Delete"
       aria-label="Delete">
       🗑
@@ -27,7 +34,9 @@
       class="icon-toggle favorite-icon" 
       [class.active]="item.isFavorite"
       type="button" 
-      (click)="onFavoriteClick()"
+      (click)="$event.stopPropagation(); onFavoriteClick()"
+      (mouseenter)="setHoveredButton('favorite')"
+      (mouseleave)="setHoveredButton(null)"
       title="Toggle Favorite"
       aria-label="Toggle Favorite">
       ★
@@ -36,15 +45,23 @@
       class="icon-toggle watched-icon" 
       [class.active]="item.isWatched"
       type="button" 
-      (click)="onWatchedClick()"
+      (click)="$event.stopPropagation(); onWatchedClick()"
+      (mouseenter)="setHoveredButton('watched')"
+      (mouseleave)="setHoveredButton(null)"
       title="Toggle Watched"
       aria-label="Toggle Watched">
       📺
     </button>
   </div>
 
-  <div class="card-title-overlay">
-    <h3>{{ item.name }}</h3>
+  <!-- Icon Zoom Popup -->
+  <div class="icon-zoom-popup" *ngIf="hoveredButton" [ngStyle]="getPopupPosition()">
+    <div class="zoom-content" [ngSwitch]="hoveredButton">
+      <span *ngSwitchCase="'edit'">✎</span>
+      <span *ngSwitchCase="'delete'">🗑</span>
+      <span *ngSwitchCase="'favorite'">★</span>
+      <span *ngSwitchCase="'watched'">📺</span>
+    </div>
   </div>
 </article>
 

@@ -17,12 +17,13 @@
 .card-link {
   position: absolute;
   inset: 0;
-  display: block;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-background {
   width: 100%;
-  height: 100%;
+  flex: 1;
   object-fit: contain;
   background: #f3f4f6;
 }
@@ -33,7 +34,7 @@
   left: 0.5rem;
   display: flex;
   gap: 0.25rem;
-  z-index: 10;
+  z-index: 20;
 }
 
 .card-top-right-buttons {
@@ -42,7 +43,7 @@
   right: 0.5rem;
   display: flex;
   gap: 0.25rem;
-  z-index: 10;
+  z-index: 20;
 }
 
 .card-title-overlay {
@@ -54,7 +55,8 @@
   align-items: center;
   justify-content: center;
   padding: 0.75rem;
-  z-index: 10;
+  z-index: 5;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
 
   h3 {
     margin: 0;
@@ -83,6 +85,7 @@
   transition: opacity 0.2s ease, background-color 0.2s ease;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
+  pointer-events: auto;
 
   &:hover {
     opacity: 1;
@@ -105,5 +108,34 @@
   opacity: 0.7;
 }
 
+.icon-zoom-popup {
+  position: absolute;
+  z-index: 30;
+  pointer-events: none;
+  animation: popupFadeIn 0.2s ease-out;
+}
 
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.zoom-content {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  border: 2px solid #3b82f6;
+}
 
