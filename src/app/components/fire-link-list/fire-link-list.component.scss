@@ -3,3 +3,10 @@
   grid-template-columns: repeat(auto-fill, minmax(180px, 175px));
   gap: 1rem;
 }
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 175px;
+    justify-content: center;
+  }
+}
