@@ -10,6 +10,7 @@ import { LoginModalComponent } from './components/login-modal/login-modal.compon
 import { FireLinkFormComponent } from './components/fire-link-form/fire-link-form.component';
 import { FireLinkListComponent } from './components/fire-link-list/fire-link-list.component';
 import { ConfirmationToastComponent } from './components/confirmation-toast/confirmation-toast.component';
+import packageJson from '../../package.json';
 
 @Component({
     selector: 'app-root',
@@ -19,7 +20,7 @@ import { ConfirmationToastComponent } from './components/confirmation-toast/conf
 })
 export class AppComponent implements OnInit {
   title = 'Fire Menu';
-  readonly appVersion = '2.0.1';
+  readonly appVersion = packageJson.version;
   showSettingsMenu = false;
 
   menuTabs = [
