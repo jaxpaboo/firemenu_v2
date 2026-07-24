@@ -18,8 +18,6 @@ export class FireLinkCardComponent {
   @Output() toggleWatched = new EventEmitter<FireLink>();
   @Output() confirmationNeeded = new EventEmitter<{action: string, item: FireLink, callback: () => void}>();
 
-  hoveredButton: string | null = null;
-
   onEditClick(): void {
     this.edit.emit(this.item);
   }
@@ -38,40 +36,5 @@ export class FireLinkCardComponent {
 
   onWatchedClick(): void {
     this.toggleWatched.emit(this.item);
-  }
-
-  setHoveredButton(button: string | null): void {
-    this.hoveredButton = button;
-  }
-
-  getPopupPosition(): { top: string; left?: string; right?: string } {
-    const baseSize = 1.875; // 30px in rem (at 16px base)
-    const buttonSize = 1; // 1rem
-    const spacing = 0.5; // spacing from edge
-
-    switch (this.hoveredButton) {
-      case 'edit':
-        return {
-          top: `calc(${spacing}rem + ${buttonSize / 2}rem - ${baseSize / 2}rem)`,
-          left: `calc(${spacing}rem + ${buttonSize / 2}rem - ${baseSize / 2}rem)`
-        };
-      case 'delete':
-        return {
-          top: `calc(${spacing}rem + ${buttonSize / 2}rem - ${baseSize / 2}rem)`,
-          left: `calc(${spacing}rem + 1.25rem + ${buttonSize / 2}rem - ${baseSize / 2}rem)`
-        };
-      case 'favorite':
-        return {
-          top: `calc(${spacing}rem + ${buttonSize / 2}rem - ${baseSize / 2}rem)`,
-          right: `calc(${spacing}rem + 1.25rem + ${buttonSize / 2}rem - ${baseSize / 2}rem)`
-        };
-      case 'watched':
-        return {
-          top: `calc(${spacing}rem + ${buttonSize / 2}rem - ${baseSize / 2}rem)`,
-          right: `calc(${spacing}rem + ${buttonSize / 2}rem - ${baseSize / 2}rem)`
-        };
-      default:
-        return { top: '0', left: '0' };
-    }
   }
 }

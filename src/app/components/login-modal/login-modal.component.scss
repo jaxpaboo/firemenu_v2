@@ -47,8 +47,18 @@
 .login-form {
   .login-row {
     display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
+    align-items: center;
+    gap: 0.75rem;
+
+    label {
+      width: 90px;
+      flex: 0 0 90px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+    }
   }
 }
 
@@ -98,4 +108,19 @@ input {
   font-size: 0.95rem;
   color: #111827;
   background: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .login-form {
+    .login-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.4rem;
+
+      label {
+        width: auto;
+        flex: 0 0 auto;
+      }
+    }
+  }
 }

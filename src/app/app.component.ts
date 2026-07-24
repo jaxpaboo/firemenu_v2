@@ -22,6 +22,7 @@ export class AppComponent implements OnInit {
   title = 'Fire Menu';
   readonly appVersion = packageJson.version;
   showSettingsMenu = false;
+  showTabsMenu = false;
 
   menuTabs = [
     { label: 'Fire Menu', active: true },
@@ -103,6 +104,10 @@ export class AppComponent implements OnInit {
     this.showSettingsMenu = !this.showSettingsMenu;
   }
 
+  toggleTabsMenu(): void {
+    this.showTabsMenu = !this.showTabsMenu;
+  }
+
   onLogoutClick(): void {
     this.showSettingsMenu = false;
     if (this.isAuthenticated) {
@@ -112,13 +117,14 @@ export class AppComponent implements OnInit {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (!this.showSettingsMenu) {
-      return;
+    const target = event.target as HTMLElement;
+
+    if (this.showSettingsMenu && !target.closest('.settings-menu')) {
+      this.showSettingsMenu = false;
     }
 
-    const target = event.target as HTMLElement;
-    if (!target.closest('.settings-menu')) {
-      this.showSettingsMenu = false;
+    if (this.showTabsMenu && !target.closest('.tabs-dropdown')) {
+      this.showTabsMenu = false;
     }
   }
 
@@ -416,6 +422,7 @@ export class AppComponent implements OnInit {
 
   selectTab(tab: 'main' | 'watched' | 'favorites' | 'all'): void {
     this.selectedTab = tab;
+    this.showTabsMenu = false;
   }
 
   scrollToBottom(): void {
@@ -462,12 +469,27 @@ export class AppComponent implements OnInit {
 
   onHeaderDoubleClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
-    // Only trigger if double-clicking on header or empty space, not on buttons
-    if (target.tagName !== 'BUTTON' && 
-        !target.closest('button') && 
-        !target.closest('.dropdown-menu')) {
+    if (this.shouldTriggerAutoScroll(target)) {
       this.toggleScroll();
     }
+  }
+
+  onListPanelDoubleClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+
+    // Header already has its own double-click handler.
+    if (target.closest('.list-header')) {
+      return;
+    }
+
+    // Trigger on panel whitespace only, not cards or interactive elements.
+    if (this.shouldTriggerAutoScroll(target)) {
+      this.toggleScroll();
+    }
+  }
+
+  private shouldTriggerAutoScroll(target: HTMLElement): boolean {
+    return !target.closest('button, a, input, textarea, select, label, .dropdown-menu, .settings-dropdown, .card, app-fire-link-card');
   }
 
   private toggleScroll(): void {

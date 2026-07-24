@@ -11,8 +11,6 @@
       class="icon-toggle edit-icon" 
       type="button" 
       (click)="$event.stopPropagation(); onEditClick()"
-      (mouseenter)="setHoveredButton('edit')"
-      (mouseleave)="setHoveredButton(null)"
       title="Edit"
       aria-label="Edit">
       ✎
@@ -21,8 +19,6 @@
       class="icon-toggle delete-icon" 
       type="button" 
       (click)="$event.stopPropagation(); onDeleteClick()"
-      (mouseenter)="setHoveredButton('delete')"
-      (mouseleave)="setHoveredButton(null)"
       title="Delete"
       aria-label="Delete">
       🗑
@@ -35,8 +31,6 @@
       [class.active]="item.isFavorite"
       type="button" 
       (click)="$event.stopPropagation(); onFavoriteClick()"
-      (mouseenter)="setHoveredButton('favorite')"
-      (mouseleave)="setHoveredButton(null)"
       title="Toggle Favorite"
       aria-label="Toggle Favorite">
       ★
@@ -46,22 +40,10 @@
       [class.active]="item.isWatched"
       type="button" 
       (click)="$event.stopPropagation(); onWatchedClick()"
-      (mouseenter)="setHoveredButton('watched')"
-      (mouseleave)="setHoveredButton(null)"
       title="Toggle Watched"
       aria-label="Toggle Watched">
       📺
     </button>
-  </div>
-
-  <!-- Icon Zoom Popup -->
-  <div class="icon-zoom-popup" *ngIf="hoveredButton" [ngStyle]="getPopupPosition()">
-    <div class="zoom-content" [ngSwitch]="hoveredButton">
-      <span *ngSwitchCase="'edit'">✎</span>
-      <span *ngSwitchCase="'delete'">🗑</span>
-      <span *ngSwitchCase="'favorite'">★</span>
-      <span *ngSwitchCase="'watched'">📺</span>
-    </div>
   </div>
 </article>
 

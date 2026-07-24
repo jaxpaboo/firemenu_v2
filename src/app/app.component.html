@@ -1,8 +1,8 @@
 <header class="topbar" (dblclick)="onHeaderDoubleClick($event)" [ngStyle]="{ 'z-index': isModalActive() ? 10 : 100 }">
   <div class="brand-section">
     <div class="brand">Fire Menu</div>
-    <div class="tabs-dropdown" aria-label="Primary navigation">
-      <button class="tab-toggle" type="button">
+    <div class="tabs-dropdown" [class.open]="showTabsMenu" aria-label="Primary navigation">
+      <button class="tab-toggle" type="button" aria-haspopup="true" [attr.aria-expanded]="showTabsMenu" (click)="toggleTabsMenu()">
         {{ getCurrentTabLabel() }}
       </button>
       <div class="dropdown-menu">
@@ -59,7 +59,7 @@
 ></app-login-modal>
 
 <main class="page">
-  <section class="list-panel">
+  <section class="list-panel" (dblclick)="onListPanelDoubleClick($event)">
     <div class="list-header" (dblclick)="onHeaderDoubleClick($event)" [ngStyle]="{ 'z-index': isModalActive() ? 10 : 50 }">
       <div class="list-header-row">
         <div>
