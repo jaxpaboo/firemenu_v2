@@ -26,6 +26,20 @@
   border-bottom: 1px solid #eef2ff;
 }
 
+.close-x-btn {
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.15rem 0.35rem;
+
+  &:hover {
+    color: #111827;
+  }
+}
+
 .modal-title-group {
   display: flex;
   align-items: center;

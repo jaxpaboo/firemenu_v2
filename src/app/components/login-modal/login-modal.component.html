@@ -2,7 +2,7 @@
   <div class="modal login-modal">
     <div class="modal-header">
       <h3>Sign in</h3>
-      <button class="btn btn-secondary" type="button" (click)="close.emit()">Close</button>
+      <button class="close-x-btn" type="button" aria-label="Close" (click)="close.emit()">X</button>
     </div>
     <form #authForm="ngForm" (ngSubmit)="submit.emit(authForm)" class="modal-body login-form">
       <div class="login-row">

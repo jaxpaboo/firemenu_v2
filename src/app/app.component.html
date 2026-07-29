@@ -106,6 +106,7 @@
   <app-fire-link-form
     [visible]="showModal"
     [model]="formModel"
+    [existingItems]="items"
     [isEditing]="isEditing"
     [isAuthenticated]="isAuthenticated"
     (save)="save($event)"
