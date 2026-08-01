@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { FireLink } from '../../models/fire-link';
@@ -9,7 +9,9 @@ import { FireLink } from '../../models/fire-link';
     templateUrl: './fire-link-form.component.html',
     styleUrl: './fire-link-form.component.scss'
 })
-export class FireLinkFormComponent {
+export class FireLinkFormComponent implements OnChanges {
+  @ViewChild('urlInputRef') private urlInputRef?: ElementRef<HTMLInputElement>;
+
   @Input() visible = false;
   @Input() model: FireLink = { id: 0, name: '', icon: '', url: '' };
   @Input() existingItems: FireLink[] = [];
@@ -18,6 +20,18 @@ export class FireLinkFormComponent {
   @Output() save = new EventEmitter<NgForm>();
   @Output() cancel = new EventEmitter<void>();
   @Output() delete = new EventEmitter<FireLink>();
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const becameVisible = changes['visible'] && changes['visible'].currentValue === true;
+    if (!becameVisible || this.isEditing) {
+      return;
+    }
+
+    window.setTimeout(() => {
+      this.urlInputRef?.nativeElement.focus();
+      this.urlInputRef?.nativeElement.select();
+    });
+  }
 
   onUrlChange(url: string): void {
     if (this.isEditing) {

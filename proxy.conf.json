@@ -1,0 +1,11 @@
+{
+  "/lu2-api": {
+    "target": "https://www.lookmovie2.to",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/lu2-api": ""
+    },
+    "logLevel": "debug"
+  }
+}

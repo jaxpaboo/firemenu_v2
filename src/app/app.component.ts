@@ -1,28 +1,37 @@
-import { Component, HostListener, OnInit, Renderer2 } from '@angular/core';
+import { Component, OnInit, Renderer2 } from '@angular/core';
 
 // Allow optional runtime `require` for an ignored local env file
 declare const require: any;
 import { CommonModule } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms';
+import { NgForm } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FireLink } from './models/fire-link';
 import { LoginModalComponent } from './components/login-modal/login-modal.component';
 import { FireLinkFormComponent } from './components/fire-link-form/fire-link-form.component';
 import { FireLinkListComponent } from './components/fire-link-list/fire-link-list.component';
 import { ConfirmationToastComponent } from './components/confirmation-toast/confirmation-toast.component';
+import { AppHeaderComponent, FireMenuTab } from './components/app-header/app-header.component';
+import { Lu2SearchModalComponent, Lu2Mode } from './components/lu2-search-modal/lu2-search-modal.component';
 import packageJson from '../../package.json';
 
 @Component({
     selector: 'app-root',
-    imports: [CommonModule, FormsModule, HttpClientModule, LoginModalComponent, FireLinkFormComponent, FireLinkListComponent, ConfirmationToastComponent],
+    imports: [
+      CommonModule,
+      HttpClientModule,
+      LoginModalComponent,
+      FireLinkFormComponent,
+      FireLinkListComponent,
+      ConfirmationToastComponent,
+      AppHeaderComponent,
+      Lu2SearchModalComponent,
+    ],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
   title = 'Fire Menu';
   readonly appVersion = packageJson.version;
-  showSettingsMenu = false;
-  showTabsMenu = false;
 
   menuTabs = [
     { label: 'Fire Menu', active: true },
@@ -67,14 +76,17 @@ export class AppComponent implements OnInit {
   formModel: FireLink = this.emptyLink();
   editingId = 0;
   showModal = false;
-  
+
+  showLu2SearchModal = false;
+  lu2Mode: Lu2Mode = 'movies';
+
   // Confirmation dialog state
   showConfirmation = false;
   confirmationMessage = '';
   pendingCallback: (() => void) | null = null;
   
-  selectedTab: 'main' | 'watched' | 'favorites' | 'all' = 'main';
-  tabs: Array<{ label: string; value: 'main' | 'watched' | 'favorites' | 'all' }> = [
+  selectedTab: FireMenuTab = 'main';
+  tabs: Array<{ label: string; value: FireMenuTab }> = [
     { label: 'Main', value: 'main' },
     { label: 'Watched', value: 'watched' },
     { label: 'Favorites', value: 'favorites' },
@@ -88,7 +100,7 @@ export class AppComponent implements OnInit {
   }
 
   private updateScrollLock(): void {
-    const isAnyModalOpen = this.showLoginPanel || this.showModal;
+    const isAnyModalOpen = this.showLoginPanel || this.showModal || this.showLu2SearchModal;
     if (isAnyModalOpen) {
       this.renderer.setStyle(document.body, 'overflow', 'hidden');
     } else {
@@ -97,46 +109,13 @@ export class AppComponent implements OnInit {
   }
 
   isModalActive(): boolean {
-    return this.showLoginPanel || this.showModal;
-  }
-
-  toggleSettingsMenu(): void {
-    this.showSettingsMenu = !this.showSettingsMenu;
-  }
-
-  toggleTabsMenu(): void {
-    this.showTabsMenu = !this.showTabsMenu;
-  }
-
-  onLogoutClick(): void {
-    this.showSettingsMenu = false;
-    if (this.isAuthenticated) {
-      this.logout();
-    }
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-
-    if (this.showSettingsMenu && !target.closest('.settings-menu')) {
-      this.showSettingsMenu = false;
-    }
-
-    if (this.showTabsMenu && !target.closest('.tabs-dropdown')) {
-      this.showTabsMenu = false;
-    }
+    return this.showLoginPanel || this.showModal || this.showLu2SearchModal;
   }
 
   toggleLoginPanel(): void {
     this.showLoginPanel = !this.showLoginPanel;
     this.authError = '';
     this.updateScrollLock();
-  }
-
-  getCurrentTabLabel(): string {
-    const currentTab = this.tabs.find(t => t.value === this.selectedTab);
-    return currentTab?.label || 'Select Tab';
   }
 
   login(form: NgForm): void {
@@ -272,6 +251,29 @@ export class AppComponent implements OnInit {
     this.formModel = this.emptyLink();
     this.showModal = true;
     this.updateScrollLock();
+  }
+
+  openLu2SearchModal(mode: Lu2Mode): void {
+    if (!this.isAuthenticated) {
+      this.showLoginPanel = true;
+      this.updateScrollLock();
+      return;
+    }
+
+    this.lu2Mode = mode;
+    this.showLu2SearchModal = true;
+    this.updateScrollLock();
+  }
+
+  onLu2ModalClose(): void {
+    this.showLu2SearchModal = false;
+    this.updateScrollLock();
+  }
+
+  onLu2LinkAdded(entry: FireLink): void {
+    const nextId = this.items.length ? Math.max(...this.items.map((item) => item.id)) + 1 : 1;
+    this.items = [...this.items, { ...entry, id: nextId }];
+    this.persistItems();
   }
 
   private loadItems(): void {
@@ -420,9 +422,8 @@ export class AppComponent implements OnInit {
     }
   }
 
-  selectTab(tab: 'main' | 'watched' | 'favorites' | 'all'): void {
+  selectTab(tab: FireMenuTab): void {
     this.selectedTab = tab;
-    this.showTabsMenu = false;
   }
 
   scrollToBottom(): void {
@@ -506,4 +507,6 @@ export class AppComponent implements OnInit {
       this.scrollToBottom();
     }
   }
+
 }
+

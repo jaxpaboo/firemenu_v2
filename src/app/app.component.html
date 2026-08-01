@@ -1,51 +1,14 @@
-<header class="topbar" (dblclick)="onHeaderDoubleClick($event)" [ngStyle]="{ 'z-index': isModalActive() ? 10 : 100 }">
-  <div class="brand-section">
-    <div class="brand">Fire Menu</div>
-    <div class="tabs-dropdown" [class.open]="showTabsMenu" aria-label="Primary navigation">
-      <button class="tab-toggle" type="button" aria-haspopup="true" [attr.aria-expanded]="showTabsMenu" (click)="toggleTabsMenu()">
-        {{ getCurrentTabLabel() }}
-      </button>
-      <div class="dropdown-menu">
-        <button
-          *ngFor="let tab of tabs"
-          [class.active]="selectedTab === tab.value"
-          class="dropdown-item"
-          type="button"
-          (click)="selectTab(tab.value)">
-          {{ tab.label }}
-        </button>
-      </div>
-    </div>
-    <button
-      *ngIf="!isAuthenticated"
-      class="btn btn-outline btn-outline-primary"
-      type="button"
-      (click)="toggleLoginPanel()">
-      Login
-    </button>
-  </div>
-
-  <div class="header-controls">
-    <div class="settings-menu">
-      <button
-        class="gear-btn"
-        type="button"
-        aria-label="Open settings menu"
-        aria-haspopup="true"
-        [attr.aria-expanded]="showSettingsMenu"
-        (click)="toggleSettingsMenu()">
-        &#9881;
-      </button>
-
-      <div class="settings-dropdown" *ngIf="showSettingsMenu">
-        <button *ngIf="isAuthenticated" class="settings-item" type="button" (click)="onLogoutClick()">
-          Logout
-        </button>
-        <div class="settings-version">v{{ appVersion }}</div>
-      </div>
-    </div>
-  </div>
-</header>
+<app-header
+  [isAuthenticated]="isAuthenticated"
+  [appVersion]="appVersion"
+  [selectedTab]="selectedTab"
+  [tabs]="tabs"
+  [isModalActive]="isModalActive()"
+  (loginClick)="toggleLoginPanel()"
+  (logoutClick)="logout()"
+  (tabSelected)="selectTab($event)"
+  (headerDoubleClick)="onHeaderDoubleClick($event)"
+></app-header>
 
 <app-login-modal
   [visible]="showLoginPanel"
@@ -74,6 +37,8 @@
             aria-label="Scroll to top">
             ↑
           </button>
+          <button class="btn btn-lu2" type="button" (click)="openLu2SearchModal('movies')" [hidden]="!isAuthenticated">LU Movie</button>
+          <button class="btn btn-lu2" type="button" (click)="openLu2SearchModal('shows')" [hidden]="!isAuthenticated">LU Show</button>
           <button class="btn btn-success" type="button" (click)="startNew()" [hidden]="!isAuthenticated">New Fire Link</button>
         </div>
       </div>
@@ -113,6 +78,14 @@
     (cancel)="cancel()"
     (delete)="deleteItem($event)"
   ></app-fire-link-form>
+
+  <app-lu2-search-modal
+    [visible]="showLu2SearchModal"
+    [mode]="lu2Mode"
+    [existingItems]="items"
+    (closeModal)="onLu2ModalClose()"
+    (linkAdded)="onLu2LinkAdded($event)"
+  ></app-lu2-search-modal>
 
 </main>
 

@@ -26,7 +26,7 @@
       <div class="form-row">
         <label class="field-label" for="url">Fire Link</label>
         <div class="field-control">
-          <input id="url" name="url" [(ngModel)]="model.url" (ngModelChange)="onUrlChange($event)" required placeholder="https://..." />
+          <input #urlInputRef id="url" name="url" [(ngModel)]="model.url" (ngModelChange)="onUrlChange($event)" required placeholder="https://..." />
         </div>
       </div>
 
