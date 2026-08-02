@@ -6,6 +6,17 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
+## Prod server
+
+Working with Firebase with Blaze enabled to get functions to work.
+NOTE: Shouldn't hit thresholds so should be free to use monthly.
+
+Commands to deploy to fireconsole:
+
+firebase init   ( choose hosting, do not overwrite index)
+firebase deploy
+firebase deploy --only functions      // Note sure... is this deploying functions directory code only?
+
 ## Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
