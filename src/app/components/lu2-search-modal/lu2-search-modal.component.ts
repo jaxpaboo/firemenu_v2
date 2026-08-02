@@ -39,7 +39,6 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
   private lu2EdgeScrollTimer: number | null = null;
   private lu2EdgeScrollDirection: -1 | 0 | 1 = 0;
 
-  private readonly lu2EdgeScrollZonePx = 100;
   private readonly lu2EdgeScrollStepPx = 14;
 
   constructor(private http: HttpClient) {}
@@ -200,13 +199,10 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
       return;
     }
 
-    const topZoneLimit = rect.top + this.lu2EdgeScrollZonePx;
-    const bottomZoneLimit = rect.bottom - this.lu2EdgeScrollZonePx;
-
     let direction: -1 | 0 | 1 = 0;
-    if (clientY <= topZoneLimit) {
+    if (clientY < rect.top) {
       direction = -1;
-    } else if (clientY >= bottomZoneLimit) {
+    } else if (clientY > rect.bottom) {
       direction = 1;
     }
 
