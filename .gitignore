@@ -45,3 +45,4 @@ src/environments/firebase.env.ts
 /.firebase
 .firebaserc
 firebase.json
+firebase-debug.log

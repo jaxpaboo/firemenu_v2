@@ -14,7 +14,8 @@ NOTE: Shouldn't hit thresholds so should be free to use monthly.
 Commands to deploy to fireconsole:
 
 firebase init   ( choose hosting, do not overwrite index)
-firebase deploy
+firebase deploy                        
+firebase deploy --only hosting        // After adding functions is they way to only deploy website code?
 firebase deploy --only functions      // Note sure... is this deploying functions directory code only?
 
 ## Code scaffolding
