@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 
 // Allow optional runtime `require` for an ignored local env file
 declare const require: any;
@@ -30,7 +30,9 @@ import packageJson from '../../package.json';
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('dpadFocusAnchorRef') private dpadFocusAnchorRef?: ElementRef<HTMLElement>;
+
   title = 'Fire Menu';
   readonly appVersion = packageJson.version;
 
@@ -68,12 +70,59 @@ export class AppComponent implements OnInit, OnDestroy {
     return false;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static staticLoadDebugMouseEventFlag(): boolean {
+    try {
+      // Use require so the import is optional at runtime/build time.
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const env = require('../environments/firebase.env') as any;
+      if (env && typeof env.DEBUG_MOUSE_EVENT !== 'undefined') {
+        return Boolean(env.DEBUG_MOUSE_EVENT);
+      }
+    } catch {}
+    return false;
+  }
+
   readonly firebaseApiKey: string = AppComponent.staticLoadApiKey();
   readonly debugKeystrokeEnabled: boolean = AppComponent.staticLoadDebugKeystrokeFlag();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static staticLoadDebugFocusEventFlag(): boolean {
+    try {
+      // Use require so the import is optional at runtime/build time.
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const env = require('../environments/firebase.env') as any;
+      if (env && typeof env.DEBUG_FOCUS_EVENT !== 'undefined') {
+        return Boolean(env.DEBUG_FOCUS_EVENT);
+      }
+    } catch {}
+    return false;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static staticLoadDebugTouchEventFlag(): boolean {
+    try {
+      // Use require so the import is optional at runtime/build time.
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const env = require('../environments/firebase.env') as any;
+      if (env && typeof env.DEBUG_TOUCH_EVENT !== 'undefined') {
+        return Boolean(env.DEBUG_TOUCH_EVENT);
+      }
+    } catch {}
+    return false;
+  }
+  readonly debugMouseEventEnabled: boolean = AppComponent.staticLoadDebugMouseEventFlag();
+  readonly debugTouchEventEnabled: boolean = AppComponent.staticLoadDebugTouchEventFlag();
+  readonly debugFocusEventEnabled: boolean = AppComponent.staticLoadDebugFocusEventFlag();
   readonly authUrl = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=';
   readonly dataUrl = 'https://fire-4961c-default-rtdb.firebaseio.com/pages.json';
-  lastDebugKeyCode: number | null = null;
+  lastDebugKey: string | null = null;
+  lastDebugMouseEvent: string | null = null;
+  lastDebugTouchEvent: string | null = null;
+  lastDebugFocusTarget: string | null = null;
   private debugKeystrokeTimer: number | null = null;
+  private debugMouseEventTimer: number | null = null;
+  private debugTouchEventTimer: number | null = null;
 
   // Storage key for persisted auth
   private readonly storageKey = 'firemenu_auth_v1';
@@ -118,20 +167,146 @@ export class AppComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.setDebugKeystrokeEvent('down', event);
+  }
+
+  @HostListener('document:keyup', ['$event'])
+  onGlobalKeyup(event: KeyboardEvent): void {
+    if (!this.debugKeystrokeEnabled) {
+      return;
+    }
+
+    this.setDebugKeystrokeEvent('up', event);
+  }
+
+  private setDebugKeystrokeEvent(action: 'down' | 'up', event: KeyboardEvent): void {
+    const legacyCode = this.getLegacyKeyCode(event);
+    const fallbackKey = this.mapLegacyDpadKey(legacyCode);
+    const rawKey = event.key && event.key !== 'Unidentified' ? event.key : '';
+    const key = rawKey || fallbackKey || 'Unidentified';
+    const codePart = event.code ? ` code:${event.code}` : '';
+    const legacyPart = legacyCode ? ` kc:${legacyCode}` : '';
+    const focusPart = ` focus:${this.getActiveElementDescriptor()}`;
+
     if (this.debugKeystrokeTimer !== null) {
       window.clearTimeout(this.debugKeystrokeTimer);
       this.debugKeystrokeTimer = null;
     }
 
-    this.lastDebugKeyCode = event.keyCode;
+    this.lastDebugKey = `${action} ${key}${codePart}${legacyPart}${focusPart}`;
     this.debugKeystrokeTimer = window.setTimeout(() => {
-      this.lastDebugKeyCode = null;
+      this.lastDebugKey = null;
       this.debugKeystrokeTimer = null;
     }, 1000);
   }
 
+  @HostListener('document:focusin', ['$event'])
+  onGlobalFocusIn(event: FocusEvent): void {
+    if (!this.debugFocusEventEnabled) {
+      return;
+    }
+
+    const target = event.target as HTMLElement | null;
+    this.lastDebugFocusTarget = target ? this.describeElement(target) : this.getActiveElementDescriptor();
+  }
+
+  @HostListener('document:mousedown', ['$event'])
+  onGlobalMouseDown(event: MouseEvent): void {
+    if (!this.debugMouseEventEnabled) {
+      return;
+    }
+
+    this.setDebugMouseEvent(`mouse down (${this.getMouseButtonLabel(event.button)})`);
+  }
+
+  @HostListener('document:mouseup', ['$event'])
+  onGlobalMouseUp(event: MouseEvent): void {
+    if (!this.debugMouseEventEnabled) {
+      return;
+    }
+
+    this.setDebugMouseEvent(`mouse up (${this.getMouseButtonLabel(event.button)})`);
+  }
+
+  @HostListener('document:auxclick', ['$event'])
+  onGlobalAuxClick(event: MouseEvent): void {
+    if (!this.debugMouseEventEnabled) {
+      return;
+    }
+
+    if (event.button === 1) {
+      this.setDebugMouseEvent('scroll wheel click');
+      return;
+    }
+
+    this.setDebugMouseEvent(`aux click (${this.getMouseButtonLabel(event.button)})`);
+  }
+
+  @HostListener('document:wheel', ['$event'])
+  onGlobalWheel(event: WheelEvent): void {
+    if (!this.debugMouseEventEnabled) {
+      return;
+    }
+
+    if (event.deltaY < 0) {
+      this.setDebugMouseEvent('scroll wheel up');
+      return;
+    }
+
+    if (event.deltaY > 0) {
+      this.setDebugMouseEvent('scroll wheel down');
+      return;
+    }
+
+    this.setDebugMouseEvent('scroll wheel');
+  }
+
+  @HostListener('document:touchstart', ['$event'])
+  onGlobalTouchStart(event: TouchEvent): void {
+    if (!this.debugTouchEventEnabled) {
+      return;
+    }
+
+    this.setDebugTouchEvent(`touch start (${event.touches.length})`);
+  }
+
+  @HostListener('document:touchmove', ['$event'])
+  onGlobalTouchMove(event: TouchEvent): void {
+    if (!this.debugTouchEventEnabled) {
+      return;
+    }
+
+    this.setDebugTouchEvent(`touch move (${event.touches.length})`);
+  }
+
+  @HostListener('document:touchend', ['$event'])
+  onGlobalTouchEnd(event: TouchEvent): void {
+    if (!this.debugTouchEventEnabled) {
+      return;
+    }
+
+    this.setDebugTouchEvent(`touch end (${event.changedTouches.length})`);
+  }
+
+  @HostListener('document:touchcancel', ['$event'])
+  onGlobalTouchCancel(event: TouchEvent): void {
+    if (!this.debugTouchEventEnabled) {
+      return;
+    }
+
+    this.setDebugTouchEvent(`touch cancel (${event.changedTouches.length})`);
+  }
+
   ngOnInit(): void {
     this.tryRestoreSession().then(() => this.loadItems());
+  }
+
+  ngAfterViewInit(): void {
+    this.focusDpadAnchor();
+
+    if (this.debugFocusEventEnabled) {
+      this.lastDebugFocusTarget = this.getActiveElementDescriptor();
+    }
   }
 
   ngOnDestroy(): void {
@@ -139,6 +314,106 @@ export class AppComponent implements OnInit, OnDestroy {
       window.clearTimeout(this.debugKeystrokeTimer);
       this.debugKeystrokeTimer = null;
     }
+
+    if (this.debugMouseEventTimer !== null) {
+      window.clearTimeout(this.debugMouseEventTimer);
+      this.debugMouseEventTimer = null;
+    }
+
+    if (this.debugTouchEventTimer !== null) {
+      window.clearTimeout(this.debugTouchEventTimer);
+      this.debugTouchEventTimer = null;
+    }
+  }
+
+  private setDebugMouseEvent(value: string): void {
+    if (this.debugMouseEventTimer !== null) {
+      window.clearTimeout(this.debugMouseEventTimer);
+      this.debugMouseEventTimer = null;
+    }
+
+    this.lastDebugMouseEvent = value;
+    this.debugMouseEventTimer = window.setTimeout(() => {
+      this.lastDebugMouseEvent = null;
+      this.debugMouseEventTimer = null;
+    }, 1000);
+  }
+
+  private getMouseButtonLabel(button: number): string {
+    if (button === 0) {
+      return 'left button';
+    }
+
+    if (button === 1) {
+      return 'scroll wheel';
+    }
+
+    if (button === 2) {
+      return 'right button';
+    }
+
+    return `button ${button}`;
+  }
+
+  private getLegacyKeyCode(event: KeyboardEvent): number {
+    const legacyEvent = event as KeyboardEvent & { which?: number };
+    return event.keyCode || legacyEvent.which || 0;
+  }
+
+  private mapLegacyDpadKey(code: number): string {
+    if (code === 19 || code === 38) {
+      return 'ArrowUp';
+    }
+
+    if (code === 20 || code === 40) {
+      return 'ArrowDown';
+    }
+
+    if (code === 21 || code === 37) {
+      return 'ArrowLeft';
+    }
+
+    if (code === 22 || code === 39) {
+      return 'ArrowRight';
+    }
+
+    if (code === 23 || code === 13) {
+      return 'Enter';
+    }
+
+    return '';
+  }
+
+  private setDebugTouchEvent(value: string): void {
+    if (this.debugTouchEventTimer !== null) {
+      window.clearTimeout(this.debugTouchEventTimer);
+      this.debugTouchEventTimer = null;
+    }
+
+    this.lastDebugTouchEvent = value;
+    this.debugTouchEventTimer = window.setTimeout(() => {
+      this.lastDebugTouchEvent = null;
+      this.debugTouchEventTimer = null;
+    }, 1000);
+  }
+
+  private getActiveElementDescriptor(): string {
+    const active = document.activeElement as HTMLElement | null;
+    if (!active) {
+      return 'none';
+    }
+
+    return this.describeElement(active);
+  }
+
+  private describeElement(element: HTMLElement): string {
+    const tag = element.tagName.toLowerCase();
+    const idPart = element.id ? `#${element.id}` : '';
+    const classPart = element.className
+      ? `.${String(element.className).trim().split(/\s+/).filter(Boolean).slice(0, 2).join('.')}`
+      : '';
+
+    return `${tag}${idPart}${classPart}`;
   }
 
   private updateScrollLock(): void {
@@ -424,6 +699,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }));
 
     const url = this.requestUrl(this.dataUrl);
+
     this.http.put(url, payload).subscribe({
       next: () => {
         console.log('Firebase list updated successfully');
@@ -548,6 +824,13 @@ export class AppComponent implements OnInit, OnDestroy {
     } else {
       this.scrollToBottom();
     }
+  }
+
+  private focusDpadAnchor(): void {
+    // Keep a stable focused element so TV remotes route directional keys reliably.
+    window.setTimeout(() => {
+      this.dpadFocusAnchorRef?.nativeElement.focus();
+    });
   }
 
 }

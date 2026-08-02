@@ -1,5 +1,5 @@
 <div class="modal-backdrop lu2-modal-backdrop" *ngIf="visible" (click)="closeAndReset()">
-  <div class="modal lu2-modal" (click)="$event.stopPropagation()" (mousemove)="onLu2ModalMouseMove($event)">
+  <div class="modal lu2-modal" tabindex="0" (click)="$event.stopPropagation()" (mousemove)="onLu2ModalMouseMove($event)">
     <div class="modal-header">
       <h3>{{ getLu2ModalTitle() }}</h3>
       <button class="close-x-btn" type="button" aria-label="Close" (click)="closeAndReset()">X</button>

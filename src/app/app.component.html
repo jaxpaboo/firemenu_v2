@@ -21,7 +21,7 @@
   (close)="toggleLoginPanel()"
 ></app-login-modal>
 
-<main class="page">
+<main class="page" tabindex="0">
   <section class="list-panel" (dblclick)="onListPanelDoubleClick($event)">
     <div class="list-header" (dblclick)="onHeaderDoubleClick($event)" [ngStyle]="{ 'z-index': isModalActive() ? 10 : 50 }">
       <div class="list-header-row">
@@ -97,6 +97,20 @@
 ></app-confirmation-toast>
 
 <div class="debug-keystroke" *ngIf="debugKeystrokeEnabled">
-  keycode: {{ lastDebugKeyCode ?? '-' }}
+  key: {{ lastDebugKey ?? '-' }}
 </div>
+
+<div class="debug-mouse-event" *ngIf="debugMouseEventEnabled">
+  mouse: {{ lastDebugMouseEvent ?? '-' }}
+</div>
+
+<div class="debug-touch-event" *ngIf="debugTouchEventEnabled">
+  touch: {{ lastDebugTouchEvent ?? '-' }}
+</div>
+
+<div class="debug-focus-event" *ngIf="debugFocusEventEnabled">
+  focus: {{ lastDebugFocusTarget ?? '-' }}
+</div>
+
+<div #dpadFocusAnchorRef class="dpad-focus-anchor" tabindex="0" aria-hidden="true"></div>
 

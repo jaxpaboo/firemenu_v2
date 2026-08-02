@@ -188,8 +188,24 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
       return;
     }
 
-    const isArrowDown = event.key === 'ArrowDown' || event.keyCode === 40;
-    const isArrowUp = event.key === 'ArrowUp' || event.keyCode === 38;
+    const normalizedKey = (event.key ?? '').toLowerCase();
+    const normalizedCode = (event.code ?? '').toLowerCase();
+    const legacyCode = this.getLegacyKeyCode(event);
+
+    const isArrowDown =
+      normalizedKey === 'arrowdown' ||
+      normalizedKey === 'down' ||
+      normalizedCode === 'arrowdown' ||
+      legacyCode === 40 ||
+      legacyCode === 20;
+
+    const isArrowUp =
+      normalizedKey === 'arrowup' ||
+      normalizedKey === 'up' ||
+      normalizedCode === 'arrowup' ||
+      legacyCode === 38 ||
+      legacyCode === 19;
+
     if (!isArrowDown && !isArrowUp) {
       return;
     }
@@ -473,6 +489,11 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
     }
 
     scrollArea.scrollBy({ top: direction * this.lu2ArrowScrollStepPx, behavior: 'smooth' });
+  }
+
+  private getLegacyKeyCode(event: KeyboardEvent): number {
+    const legacyEvent = event as KeyboardEvent & { which?: number };
+    return event.keyCode || legacyEvent.which || 0;
   }
 
   private stopLu2EdgeScroll(): void {
