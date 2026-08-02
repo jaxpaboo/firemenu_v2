@@ -95,7 +95,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 3;
-  cursor: pointer;
+  cursor: default;
   outline: none;
 }
 
@@ -111,6 +111,33 @@
 .lu2-result-card:focus-visible {
   border-color: #ef4444;
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.35);
+}
+
+.lu2-play-overlay {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translate(-50%, 0);
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  background: #16a34a;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0.55rem 0.95rem;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.lu2-result-card:hover .lu2-play-overlay {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0) scale(1.02);
+}
+
+.lu2-play-overlay:hover {
+  background: #15803d;
 }
 
 .lu2-rating {
@@ -193,6 +220,10 @@
   opacity: 1;
   pointer-events: auto;
   transform: translate(-50%, -50%) scale(1.02);
+}
+
+.lu2-add-overlay:hover {
+  background: rgba(153, 27, 27, 0.98);
 }
 
 .lu2-no-results-toast {

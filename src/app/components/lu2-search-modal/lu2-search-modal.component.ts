@@ -1,28 +1,9 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { FireLink } from '../../models/fire-link';
-
-export type Lu2Mode = 'movies' | 'shows';
-
-interface Lu2Poster {
-  w100?: string;
-  w200?: string;
-  w300?: string;
-  w400?: string;
-  w500?: string;
-}
-
-interface Lu2MovieResult {
-  id_movie: number;
-  slug: string;
-  title: string;
-  description: string;
-  year?: number;
-  imdb_rating?: number;
-  poster?: Lu2Poster;
-}
+import { Lu2Mode, Lu2MovieResult } from '../../models/lu2-search';
 
 @Component({
   selector: 'app-lu2-search-modal',
@@ -32,6 +13,7 @@ interface Lu2MovieResult {
 })
 export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
   @ViewChild('lu2SearchInputRef') private lu2SearchInputRef?: ElementRef<HTMLInputElement>;
+  @ViewChild('lu2ScrollAreaRef') private lu2ScrollAreaRef?: ElementRef<HTMLElement>;
 
   @Input() visible = false;
   @Input() mode: Lu2Mode = 'movies';
@@ -44,13 +26,21 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
   readonly lu2ProxyBase = '/lu2-api';
   readonly lu2SiteBase = 'https://www.lookmovie2.to';
   readonly lu2AssetBase = 'https://www.lookmovie2.to';
+  readonly lu2NoPosterImage = 'https://via.placeholder.com/600x340?text=No+Poster';
 
   lu2Query = '';
   lu2Loading = false;
   lu2Error = '';
   lu2Results: Lu2MovieResult[] = [];
+  lu2HasSearched = false;
   showLu2NoResultsToast = false;
   private lu2NoResultsTimer: number | null = null;
+  private lu2SearchDebounceTimer: number | null = null;
+  private lu2EdgeScrollTimer: number | null = null;
+  private lu2EdgeScrollDirection: -1 | 0 | 1 = 0;
+
+  private readonly lu2EdgeScrollZonePx = 100;
+  private readonly lu2EdgeScrollStepPx = 14;
 
   constructor(private http: HttpClient) {}
 
@@ -65,9 +55,15 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
         this.lu2SearchInputRef?.nativeElement.select();
       });
     }
+
+    if (changes['visible'] && changes['visible'].currentValue === false) {
+      this.stopLu2EdgeScroll();
+    }
   }
 
   ngOnDestroy(): void {
+    this.stopLu2EdgeScroll();
+    this.clearLu2SearchDebounceTimer();
     this.clearLu2NoResultsTimer();
   }
 
@@ -76,14 +72,18 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
     this.closeModal.emit();
   }
 
-  searchLu2(): void {
+  searchLu2(showEmptyQueryError = true): void {
+    this.clearLu2SearchDebounceTimer();
+
     const query = this.lu2Query.trim();
     if (!query) {
-      this.lu2Error = `Enter a ${this.getLu2ModeLabel().toLowerCase()} title to search.`;
+      this.lu2HasSearched = false;
+      this.lu2Error = showEmptyQueryError ? `Enter a ${this.getLu2ModeLabel().toLowerCase()} title to search.` : '';
       this.lu2Results = [];
       return;
     }
 
+    this.lu2HasSearched = true;
     this.lu2Loading = true;
     this.lu2Error = '';
     this.showLu2NoResultsToast = false;
@@ -138,19 +138,97 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
   getLu2CardBackground(result: Lu2MovieResult): string {
     const posterPath = result.poster?.w200 ?? result.poster?.w300 ?? result.poster?.w400 ?? result.poster?.w100 ?? '';
     if (!posterPath) {
-      return 'https://via.placeholder.com/600x340?text=No+Poster';
+      return this.lu2NoPosterImage;
     }
 
     return this.normalizeLu2AssetUrl(posterPath);
+  }
+
+  trackByLu2Result(index: number, result: Lu2MovieResult): string {
+    return result.slug || String(result.id_movie || index);
+  }
+
+  playLu2Result(result: Lu2MovieResult): void {
+    const slug = String(result.slug ?? '').trim();
+    if (!slug) {
+      return;
+    }
+
+    const entryUrl = `${this.lu2SiteBase}/${this.mode}/view/${slug}`;
+    window.open(entryUrl, '_blank', 'noopener,noreferrer');
+  }
+
+  onLu2QueryInput(): void {
+    this.clearLu2SearchDebounceTimer();
+    this.showLu2NoResultsToast = false;
+    this.clearLu2NoResultsTimer();
+
+    this.lu2SearchDebounceTimer = window.setTimeout(() => {
+      this.lu2SearchDebounceTimer = null;
+      this.searchLu2(false);
+    }, 500);
+  }
+
+  onLu2ModalMouseMove(event: MouseEvent): void {
+    this.updateLu2EdgeScrollFromPointer(event.clientX, event.clientY);
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onDocumentMouseMove(event: MouseEvent): void {
+    if (!this.visible) {
+      return;
+    }
+
+    this.updateLu2EdgeScrollFromPointer(event.clientX, event.clientY);
+  }
+
+  @HostListener('window:blur')
+  onWindowBlur(): void {
+    this.stopLu2EdgeScroll();
+  }
+
+  private updateLu2EdgeScrollFromPointer(clientX: number, clientY: number): void {
+    const scrollArea = this.lu2ScrollAreaRef?.nativeElement;
+    if (!scrollArea) {
+      return;
+    }
+
+    const rect = scrollArea.getBoundingClientRect();
+    const isWithinHorizontalBounds = clientX >= rect.left && clientX <= rect.right;
+    if (!isWithinHorizontalBounds) {
+      this.updateLu2EdgeScrollDirection(0);
+      return;
+    }
+
+    const topZoneLimit = rect.top + this.lu2EdgeScrollZonePx;
+    const bottomZoneLimit = rect.bottom - this.lu2EdgeScrollZonePx;
+
+    let direction: -1 | 0 | 1 = 0;
+    if (clientY <= topZoneLimit) {
+      direction = -1;
+    } else if (clientY >= bottomZoneLimit) {
+      direction = 1;
+    }
+
+    this.updateLu2EdgeScrollDirection(direction);
   }
 
   getLu2ModeLabel(): 'Movie' | 'Show' {
     return this.mode === 'shows' ? 'Show' : 'Movie';
   }
 
+  getLu2ModalTitle(): string {
+    const baseTitle = `+LU ${this.getLu2ModeLabel()}`;
+    if (!this.lu2HasSearched || this.lu2Results.length === 0) {
+      return baseTitle;
+    }
+
+    return `${baseTitle} (${this.lu2Results.length})`;
+  }
+
   getLu2Placeholder(): string {
     if (this.mode === 'shows') {
-      return 'Search shows (example: Breading Bad)';
+      return 'Search shows (example: Breaking Bad)';
     }
 
     return 'Search movies (example: matrix)';
@@ -248,7 +326,10 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
   }
 
   private resetLu2SearchState(): void {
+    this.stopLu2EdgeScroll();
+    this.clearLu2SearchDebounceTimer();
     this.lu2Query = '';
+    this.lu2HasSearched = false;
     this.lu2Results = [];
     this.lu2Error = '';
     this.showLu2NoResultsToast = false;
@@ -336,6 +417,47 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
     if (this.lu2NoResultsTimer !== null) {
       window.clearTimeout(this.lu2NoResultsTimer);
       this.lu2NoResultsTimer = null;
+    }
+  }
+
+  private clearLu2SearchDebounceTimer(): void {
+    if (this.lu2SearchDebounceTimer !== null) {
+      window.clearTimeout(this.lu2SearchDebounceTimer);
+      this.lu2SearchDebounceTimer = null;
+    }
+  }
+
+  private updateLu2EdgeScrollDirection(direction: -1 | 0 | 1): void {
+    if (direction === this.lu2EdgeScrollDirection) {
+      return;
+    }
+
+    if (direction === 0) {
+      this.stopLu2EdgeScroll();
+      return;
+    }
+
+    this.lu2EdgeScrollDirection = direction;
+    if (this.lu2EdgeScrollTimer !== null) {
+      return;
+    }
+
+    this.lu2EdgeScrollTimer = window.setInterval(() => {
+      const scrollArea = this.lu2ScrollAreaRef?.nativeElement;
+      if (!scrollArea || this.lu2EdgeScrollDirection === 0) {
+        this.stopLu2EdgeScroll();
+        return;
+      }
+
+      scrollArea.scrollBy({ top: this.lu2EdgeScrollDirection * this.lu2EdgeScrollStepPx });
+    }, 16);
+  }
+
+  private stopLu2EdgeScroll(): void {
+    this.lu2EdgeScrollDirection = 0;
+    if (this.lu2EdgeScrollTimer !== null) {
+      window.clearInterval(this.lu2EdgeScrollTimer);
+      this.lu2EdgeScrollTimer = null;
     }
   }
 }

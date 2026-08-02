@@ -68,6 +68,11 @@
     text-align: center;
     line-height: 1.2;
   }
+
+  h3.dark-title-bg {
+    background: #000000;
+    color: #ffffff;
+  }
 }
 
 .icon-toggle {
@@ -92,13 +97,28 @@
   }
 }
 
+.edit-icon:hover {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+.delete-icon:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
 .favorite-icon.active,
-.watched-icon.active,
 .edit-icon.active,
 .delete-icon.active {
   background: #fbbf24;
   opacity: 1;
   color: #92400e;
+}
+
+.watched-icon.active {
+  background: #f9a8d4;
+  opacity: 1;
+  color: #831843;
 }
 
 .favorite-icon:not(.active),

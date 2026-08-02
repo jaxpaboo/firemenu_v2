@@ -1,8 +1,8 @@
-<article class="card">
+<article class="card" (mouseenter)="onCardHoverStart()" (mouseleave)="onCardHoverEnd()">
   <a class="card-link" [href]="item.url">
     <img class="card-background" [src]="item.icon || '/fire.ico'" [alt]="item.name" />
     <div class="card-title-overlay">
-      <h3>{{ item.name }}</h3>
+      <h3 [class.dark-title-bg]="shouldUseDarkTitleBackground">{{ item.name }}</h3>
     </div>
   </a>
 
@@ -11,6 +11,8 @@
       class="icon-toggle edit-icon" 
       type="button" 
       (click)="$event.stopPropagation(); onEditClick()"
+      (mouseenter)="onActionButtonHoverStart()"
+      (mouseleave)="onActionButtonHoverEnd()"
       title="Edit"
       aria-label="Edit">
       ✎
@@ -19,6 +21,8 @@
       class="icon-toggle delete-icon" 
       type="button" 
       (click)="$event.stopPropagation(); onDeleteClick()"
+      (mouseenter)="onActionButtonHoverStart()"
+      (mouseleave)="onActionButtonHoverEnd()"
       title="Delete"
       aria-label="Delete">
       🗑
@@ -28,18 +32,22 @@
   <div class="card-top-right-buttons" *ngIf="isAuthenticated">
     <button 
       class="icon-toggle favorite-icon" 
-      [class.active]="item.isFavorite"
+      [class.active]="isFavoritePreviewActive"
       type="button" 
       (click)="$event.stopPropagation(); onFavoriteClick()"
+      (mouseenter)="onFavoriteHoverStart(); onActionButtonHoverStart()"
+      (mouseleave)="onFavoriteHoverEnd(); onActionButtonHoverEnd()"
       title="Toggle Favorite"
       aria-label="Toggle Favorite">
       ★
     </button>
     <button 
       class="icon-toggle watched-icon" 
-      [class.active]="item.isWatched"
+      [class.active]="isWatchedPreviewActive"
       type="button" 
       (click)="$event.stopPropagation(); onWatchedClick()"
+      (mouseenter)="onWatchedHoverStart(); onActionButtonHoverStart()"
+      (mouseleave)="onWatchedHoverEnd(); onActionButtonHoverEnd()"
       title="Toggle Watched"
       aria-label="Toggle Watched">
       📺

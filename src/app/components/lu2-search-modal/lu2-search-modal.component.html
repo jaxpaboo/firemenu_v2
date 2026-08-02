@@ -1,11 +1,11 @@
 <div class="modal-backdrop lu2-modal-backdrop" *ngIf="visible" (click)="closeAndReset()">
-  <div class="modal lu2-modal" (click)="$event.stopPropagation()">
+  <div class="modal lu2-modal" (click)="$event.stopPropagation()" (mousemove)="onLu2ModalMouseMove($event)">
     <div class="modal-header">
-      <h3>+LU {{ getLu2ModeLabel() }}</h3>
+      <h3>{{ getLu2ModalTitle() }}</h3>
       <button class="close-x-btn" type="button" aria-label="Close" (click)="closeAndReset()">X</button>
     </div>
 
-    <form class="modal-body lu2-search-body" (ngSubmit)="searchLu2()">
+    <form #lu2ScrollAreaRef class="modal-body lu2-search-body" (ngSubmit)="searchLu2()">
       <div class="lu2-search-row">
         <input
           #lu2SearchInputRef
@@ -13,6 +13,7 @@
           name="lu2SearchInput"
           type="text"
           [(ngModel)]="lu2Query"
+          (input)="onLu2QueryInput()"
           [placeholder]="getLu2Placeholder()"
           autocomplete="off"
         />
@@ -24,13 +25,7 @@
       <div class="lu2-results" *ngIf="lu2Results.length > 0">
         <article
           class="lu2-result-card"
-          *ngFor="let result of lu2Results"
-          role="button"
-          tabindex="0"
-          aria-label="Add link for {{ result.title }}"
-          (click)="addLu2Result(result)"
-          (keydown.enter)="addLu2Result(result)"
-          (keydown.space)="$event.preventDefault(); addLu2Result(result)"
+          *ngFor="let result of lu2Results; trackBy: trackByLu2Result"
           [ngStyle]="{ 'background-image': 'url(' + getLu2CardBackground(result) + ')' }">
           <div class="lu2-rating">
             <span class="lu2-star">★</span>
@@ -38,6 +33,7 @@
             <span class="lu2-scale" *ngIf="result.imdb_rating">/10</span>
           </div>
           <div class="lu2-year">{{ result.year || 'N/A' }}</div>
+          <button class="lu2-play-overlay" type="button" (click)="playLu2Result(result)">Play Movie</button>
           <h4 class="lu2-title">{{ result.title }}</h4>
           <button class="lu2-add-overlay" type="button" (click)="$event.stopPropagation(); addLu2Result(result)">+ Add Link</button>
         </article>

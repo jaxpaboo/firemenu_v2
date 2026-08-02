@@ -26,7 +26,7 @@
     <div class="list-header" (dblclick)="onHeaderDoubleClick($event)" [ngStyle]="{ 'z-index': isModalActive() ? 10 : 50 }">
       <div class="list-header-row">
         <div>
-          <p class="section-label">Fire Links -- <b>{{selectedTab.toUpperCase()}}</b></p>
+          <p class="section-label"><b>{{selectedTab.toUpperCase()}}</b></p>
         </div>
         <div class="list-actions">
           <button
@@ -39,7 +39,7 @@
           </button>
           <button class="btn btn-lu2" type="button" (click)="openLu2SearchModal('movies')" [hidden]="!isAuthenticated">LU Movie</button>
           <button class="btn btn-lu2" type="button" (click)="openLu2SearchModal('shows')" [hidden]="!isAuthenticated">LU Show</button>
-          <button class="btn btn-success" type="button" (click)="startNew()" [hidden]="!isAuthenticated">New Fire Link</button>
+          <button class="btn btn-success" type="button" (click)="startNew()" [hidden]="!isAuthenticated">New Link</button>
         </div>
       </div>
     </div>

@@ -11,7 +11,8 @@ import { FireLinkFormComponent } from './components/fire-link-form/fire-link-for
 import { FireLinkListComponent } from './components/fire-link-list/fire-link-list.component';
 import { ConfirmationToastComponent } from './components/confirmation-toast/confirmation-toast.component';
 import { AppHeaderComponent, FireMenuTab } from './components/app-header/app-header.component';
-import { Lu2SearchModalComponent, Lu2Mode } from './components/lu2-search-modal/lu2-search-modal.component';
+import { Lu2SearchModalComponent } from './components/lu2-search-modal/lu2-search-modal.component';
+import { Lu2Mode } from './models/lu2-search';
 import packageJson from '../../package.json';
 
 @Component({

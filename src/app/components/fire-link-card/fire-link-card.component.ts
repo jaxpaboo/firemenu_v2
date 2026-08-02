@@ -18,6 +18,23 @@ export class FireLinkCardComponent {
   @Output() toggleWatched = new EventEmitter<FireLink>();
   @Output() confirmationNeeded = new EventEmitter<{action: string, item: FireLink, callback: () => void}>();
 
+  isFavoriteHovered = false;
+  isWatchedHovered = false;
+  isCardHovered = false;
+  hoveredActionButtons = 0;
+
+  get isFavoritePreviewActive(): boolean {
+    return this.isFavoriteHovered ? !Boolean(this.item?.isFavorite) : Boolean(this.item?.isFavorite);
+  }
+
+  get isWatchedPreviewActive(): boolean {
+    return this.isWatchedHovered ? !Boolean(this.item?.isWatched) : Boolean(this.item?.isWatched);
+  }
+
+  get shouldUseDarkTitleBackground(): boolean {
+    return this.isCardHovered && this.hoveredActionButtons === 0;
+  }
+
   onEditClick(): void {
     this.edit.emit(this.item);
   }
@@ -36,5 +53,38 @@ export class FireLinkCardComponent {
 
   onWatchedClick(): void {
     this.toggleWatched.emit(this.item);
+  }
+
+  onFavoriteHoverStart(): void {
+    this.isFavoriteHovered = true;
+  }
+
+  onFavoriteHoverEnd(): void {
+    this.isFavoriteHovered = false;
+  }
+
+  onWatchedHoverStart(): void {
+    this.isWatchedHovered = true;
+  }
+
+  onWatchedHoverEnd(): void {
+    this.isWatchedHovered = false;
+  }
+
+  onCardHoverStart(): void {
+    this.isCardHovered = true;
+  }
+
+  onCardHoverEnd(): void {
+    this.isCardHovered = false;
+    this.hoveredActionButtons = 0;
+  }
+
+  onActionButtonHoverStart(): void {
+    this.hoveredActionButtons += 1;
+  }
+
+  onActionButtonHoverEnd(): void {
+    this.hoveredActionButtons = Math.max(0, this.hoveredActionButtons - 1);
   }
 }
