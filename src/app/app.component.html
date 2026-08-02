@@ -96,3 +96,7 @@
   (cancel)="onConfirmationCancel()"
 ></app-confirmation-toast>
 
+<div class="debug-keystroke" *ngIf="debugKeystrokeEnabled">
+  keycode: {{ lastDebugKeyCode ?? '-' }}
+</div>
+

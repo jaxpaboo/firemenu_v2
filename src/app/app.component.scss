@@ -202,3 +202,18 @@ h2 {
   }
 }
 
+.debug-keystroke {
+  position: fixed;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  z-index: 9999;
+  font-size: 0.68rem;
+  line-height: 1;
+  color: #111827;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #d1d5db;
+  border-radius: 0.35rem;
+  padding: 0.2rem 0.35rem;
+  pointer-events: none;
+}
+

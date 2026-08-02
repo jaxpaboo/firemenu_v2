@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2 } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 // Allow optional runtime `require` for an ignored local env file
 declare const require: any;
@@ -30,7 +30,7 @@ import packageJson from '../../package.json';
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'Fire Menu';
   readonly appVersion = packageJson.version;
 
@@ -55,9 +55,25 @@ export class AppComponent implements OnInit {
     return 'MISSING_API_KEY__MISSING_ENV_FILE';
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static staticLoadDebugKeystrokeFlag(): boolean {
+    try {
+      // Use require so the import is optional at runtime/build time.
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const env = require('../environments/firebase.env') as any;
+      if (env && typeof env.DEBUG_KEYSTROKE !== 'undefined') {
+        return Boolean(env.DEBUG_KEYSTROKE);
+      }
+    } catch {}
+    return false;
+  }
+
   readonly firebaseApiKey: string = AppComponent.staticLoadApiKey();
+  readonly debugKeystrokeEnabled: boolean = AppComponent.staticLoadDebugKeystrokeFlag();
   readonly authUrl = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=';
   readonly dataUrl = 'https://fire-4961c-default-rtdb.firebaseio.com/pages.json';
+  lastDebugKeyCode: number | null = null;
+  private debugKeystrokeTimer: number | null = null;
 
   // Storage key for persisted auth
   private readonly storageKey = 'firemenu_auth_v1';
@@ -96,8 +112,33 @@ export class AppComponent implements OnInit {
 
   constructor(private http: HttpClient, private renderer: Renderer2) {}
 
+  @HostListener('document:keydown', ['$event'])
+  onGlobalKeydown(event: KeyboardEvent): void {
+    if (!this.debugKeystrokeEnabled) {
+      return;
+    }
+
+    if (this.debugKeystrokeTimer !== null) {
+      window.clearTimeout(this.debugKeystrokeTimer);
+      this.debugKeystrokeTimer = null;
+    }
+
+    this.lastDebugKeyCode = event.keyCode;
+    this.debugKeystrokeTimer = window.setTimeout(() => {
+      this.lastDebugKeyCode = null;
+      this.debugKeystrokeTimer = null;
+    }, 1000);
+  }
+
   ngOnInit(): void {
     this.tryRestoreSession().then(() => this.loadItems());
+  }
+
+  ngOnDestroy(): void {
+    if (this.debugKeystrokeTimer !== null) {
+      window.clearTimeout(this.debugKeystrokeTimer);
+      this.debugKeystrokeTimer = null;
+    }
   }
 
   private updateScrollLock(): void {

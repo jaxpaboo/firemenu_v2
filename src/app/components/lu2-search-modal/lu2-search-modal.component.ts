@@ -40,6 +40,7 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
   private lu2EdgeScrollDirection: -1 | 0 | 1 = 0;
 
   private readonly lu2EdgeScrollStepPx = 14;
+  private readonly lu2ArrowScrollStepPx = 120;
 
   constructor(private http: HttpClient) {}
 
@@ -179,6 +180,22 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
     }
 
     this.updateLu2EdgeScrollFromPointer(event.clientX, event.clientY);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent): void {
+    if (!this.visible) {
+      return;
+    }
+
+    const isArrowDown = event.key === 'ArrowDown' || event.keyCode === 40;
+    const isArrowUp = event.key === 'ArrowUp' || event.keyCode === 38;
+    if (!isArrowDown && !isArrowUp) {
+      return;
+    }
+
+    event.preventDefault();
+    this.scrollLu2ByArrow(isArrowDown ? 1 : -1);
   }
 
   @HostListener('window:blur')
@@ -447,6 +464,15 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
 
       scrollArea.scrollBy({ top: this.lu2EdgeScrollDirection * this.lu2EdgeScrollStepPx });
     }, 16);
+  }
+
+  private scrollLu2ByArrow(direction: -1 | 1): void {
+    const scrollArea = this.lu2ScrollAreaRef?.nativeElement;
+    if (!scrollArea) {
+      return;
+    }
+
+    scrollArea.scrollBy({ top: direction * this.lu2ArrowScrollStepPx, behavior: 'smooth' });
   }
 
   private stopLu2EdgeScroll(): void {
