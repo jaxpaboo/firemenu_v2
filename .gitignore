@@ -46,3 +46,6 @@ src/environments/firebase.env.ts
 .firebaserc
 firebase.json
 firebase-debug.log
+
+# AI Addins
+/.continue

@@ -84,7 +84,35 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   readonly firebaseApiKey: string = AppComponent.staticLoadApiKey();
-  readonly debugKeystrokeEnabled: boolean = AppComponent.staticLoadDebugKeystrokeFlag();
+
+  // Build-time env defaults — only used to seed the initial value of the
+  // runtime `enableDebug` toggle when no localStorage entry exists. Once the
+  // app is running, the runtime toggle is the sole gate for the debug
+  // overlays (none of these env flags short-circuit them at runtime).
+  private readonly _debugDefaultFromEnv: boolean =
+    AppComponent.staticLoadDebugKeystrokeFlag() ||
+    AppComponent.staticLoadDebugMouseEventFlag() ||
+    AppComponent.staticLoadDebugTouchEventFlag() ||
+    AppComponent.staticLoadDebugFocusEventFlag();
+
+  // The four overlay gates all read from the same source — the runtime
+  // `enableDebug` toggle. The env-file flags are NOT OR'd in here; they only
+  // seed the initial value of `enableDebug` itself (see `tryRestoreDebugFlag`).
+  get debugKeystrokeEnabled(): boolean {
+    return this.enableDebug;
+  }
+
+  get debugMouseEventEnabled(): boolean {
+    return this.enableDebug;
+  }
+
+  get debugTouchEventEnabled(): boolean {
+    return this.enableDebug;
+  }
+
+  get debugFocusEventEnabled(): boolean {
+    return this.enableDebug;
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static staticLoadDebugFocusEventFlag(): boolean {
@@ -111,9 +139,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     } catch {}
     return false;
   }
-  readonly debugMouseEventEnabled: boolean = AppComponent.staticLoadDebugMouseEventFlag();
-  readonly debugTouchEventEnabled: boolean = AppComponent.staticLoadDebugTouchEventFlag();
-  readonly debugFocusEventEnabled: boolean = AppComponent.staticLoadDebugFocusEventFlag();
   readonly authUrl = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=';
   readonly dataUrl = 'https://fire-4961c-default-rtdb.firebaseio.com/pages.json';
   lastDebugKey: string | null = null;
@@ -126,6 +151,15 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Storage key for persisted auth
   private readonly storageKey = 'firemenu_auth_v1';
+
+  // Storage key for the runtime "Enable DEBUG" toggle.
+  // Independent from auth so logout/migration doesn't clobber debug prefs.
+  private readonly debugStorageKey = 'firemenu_debug_v1';
+
+  // Master debug switch. Defaults to false; restored from localStorage in
+  // ngOnInit. When true, overrides the env-file DEBUG_* flags and shows all
+  // four debug overlays.
+  enableDebug = false;
 
   authEmail = '';
   authPassword = '';
@@ -298,6 +332,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.tryRestoreDebugFlag();
     this.tryRestoreSession().then(() => this.loadItems());
   }
 
@@ -520,6 +555,35 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     } catch (e) {
       // ignore malformed storage
+    }
+  }
+
+  private tryRestoreDebugFlag(): void {
+    try {
+      const raw = localStorage.getItem(this.debugStorageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw) as { enabled?: boolean };
+        if (typeof parsed?.enabled === 'boolean') {
+          this.enableDebug = parsed.enabled;
+        }
+        return;
+      }
+    } catch {
+      // fall through to env-derived default
+    }
+
+    // No prior user choice — seed the toggle from the build-time env flags so
+    // a developer who set DEBUG_KEYSTROKE (or any other debug flag) in
+    // firebase.env.ts still sees the overlays on first boot.
+    this.enableDebug = this._debugDefaultFromEnv;
+  }
+
+  onEnableDebugChange(enabled: boolean): void {
+    this.enableDebug = enabled;
+    try {
+      localStorage.setItem(this.debugStorageKey, JSON.stringify({ enabled }));
+    } catch {
+      // ignore storage failures (private mode, quota, etc.)
     }
   }
 

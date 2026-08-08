@@ -39,6 +39,14 @@
       </button>
 
       <div class="settings-dropdown" *ngIf="showSettingsMenu">
+        <label class="settings-item settings-toggle">
+          <input
+            type="checkbox"
+            [checked]="enableDebug"
+            (change)="onEnableDebugToggle($event)"
+            aria-label="ENABLE DEBUG overlay" />
+          <span>ENABLE DEBUG</span>
+        </label>
         <button *ngIf="isAuthenticated" class="settings-item" type="button" (click)="onLogoutClick()">
           Logout
         </button>

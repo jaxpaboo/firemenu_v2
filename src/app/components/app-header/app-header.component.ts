@@ -15,11 +15,13 @@ export class AppHeaderComponent {
   @Input() selectedTab: FireMenuTab = 'main';
   @Input() tabs: Array<{ label: string; value: FireMenuTab }> = [];
   @Input() isModalActive = false;
+  @Input() enableDebug = false;
 
   @Output() loginClick = new EventEmitter<void>();
   @Output() logoutClick = new EventEmitter<void>();
   @Output() tabSelected = new EventEmitter<FireMenuTab>();
   @Output() headerDoubleClick = new EventEmitter<MouseEvent>();
+  @Output() enableDebugChange = new EventEmitter<boolean>();
 
   showSettingsMenu = false;
   showTabsMenu = false;
@@ -58,5 +60,11 @@ export class AppHeaderComponent {
   onLogoutClick(): void {
     this.showSettingsMenu = false;
     this.logoutClick.emit();
+  }
+
+  onEnableDebugToggle(event: Event): void {
+    const target = event.target as HTMLInputElement | null;
+    this.enableDebugChange.emit(!!target?.checked);
+    this.showSettingsMenu = false;
   }
 }

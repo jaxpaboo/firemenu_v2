@@ -4,10 +4,12 @@
   [selectedTab]="selectedTab"
   [tabs]="tabs"
   [isModalActive]="isModalActive()"
+  [enableDebug]="enableDebug"
   (loginClick)="toggleLoginPanel()"
   (logoutClick)="logout()"
   (tabSelected)="selectTab($event)"
   (headerDoubleClick)="onHeaderDoubleClick($event)"
+  (enableDebugChange)="onEnableDebugChange($event)"
 ></app-header>
 
 <app-login-modal

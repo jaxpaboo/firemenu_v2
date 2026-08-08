@@ -155,7 +155,7 @@ export class Lu2SearchModalComponent implements OnChanges, OnDestroy {
     }
 
     const entryUrl = `${this.lu2SiteBase}/${this.mode}/view/${slug}`;
-    window.open(entryUrl, '_blank', 'noopener,noreferrer');
+    window.location.assign(entryUrl);
   }
 
   onLu2QueryInput(): void {
